@@ -2,9 +2,10 @@ package core
 
 import (
 	"database/sql"
-	"fmt"
+	"strconv"
 
 	"erm-tools/src/model"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -14,7 +15,7 @@ type DbRead struct {
 }
 
 func NewDbRead() DbRead {
-	return DbRead{AbstractRead: AbstractRead{AllTable: make(map[string]model.Table, 16)}}
+	return DbRead{AbstractRead: AbstractRead{AllTable: make(map[string]*model.Table, 16)}}
 }
 
 func (read *DbRead) db() *sql.DB {
@@ -29,7 +30,7 @@ func (read *DbRead) db() *sql.DB {
 }
 
 func (red *DbRead) ReadAll(dbname string) {
-
+	red.readTable("tm_test2")
 }
 
 func (read *DbRead) readTable(name string) {
@@ -43,48 +44,106 @@ func (read *DbRead) readTable(name string) {
 		NUMERIC_PRECISION,
 		NUMERIC_SCALE,
 		COLUMN_COMMENT,
-		COLUMN_TYPE
+		COLUMN_TYPE,
+		EXTRA,
+		COLUMN_DEFAULT
 	from COLUMNS
 	where TABLE_SCHEMA = ?
-	and TABLE_NAME = 'tm_test'`)
+	and TABLE_NAME = ?`)
 	defer stmt.Close()
-	rows, _ := stmt.Query("demodb")
+	rows, _ := stmt.Query("demodb", name)
 	defer rows.Close()
+	tb := read.AllTable[name]
+	if tb == nil {
+		tb = model.NewTable(name)
+	}
 	var tableName string
 	var colName string
-	var idNull string
+	var isNull string
 	var dataType string
 	var charLen string
 	var numLen string
 	var numScale string
 	var colComment string
 	var colType string
+	var extra string
+	var defval string
+	var col model.Column
+	var colMap = make(map[string]model.Column, 8)
 	for rows.Next() {
-		rows.Scan(&tableName, &colName, &idNull, &dataType, &charLen, &numLen, &numScale, &colComment, &colType)
-		fmt.Print("tableName = ", tableName)
-		fmt.Println(", colName = ", colName)
+		rows.Scan(&tableName, &colName, &isNull, &dataType, &charLen, &numLen, &numScale, &colComment, &colType, &extra, &defval)
+		col.PhysicalName = colName
+		col.LogicalName = colComment
+		col.Type = dataType
+		col.DefaultValue = defval
+		if charLen != "" && charLen != "null" {
+			l, _ := strconv.Atoi(charLen)
+			col.Length = int8(l)
+		} else if numLen != "" && numLen != "null" {
+			l, _ := strconv.Atoi(numLen)
+			col.Length = int8(l)
+		}
+		if numScale != "" && numScale != "null" {
+			l, _ := strconv.Atoi(numScale)
+			col.Decimal = int8(l)
+		}
+		if extra == "auto_increment" {
+			col.AutoIncrement = true
+		}
+		col.NotNull = isNull == "NO"
+		col.ColumnType = colType
+		tb.Columns = append(tb.Columns, col)
+		colMap[colName] = col
 	}
-	read.readIndex()
+	read.readIndex(tb, colMap)
+	read.AllTable[tb.PhysicalName] = tb
 }
 
-func (red *DbRead) readIndex() {
+func (red *DbRead) readIndex(table *model.Table, colMap map[string]model.Column) {
 	db := red.db()
 	stmt, _ := db.Prepare(
 		`select TABLE_NAME, NON_UNIQUE, INDEX_NAME, COLUMN_NAME
 		from STATISTICS
 		where TABLE_SCHEMA = ?
-		  and TABLE_NAME = 'tm_test'`)
+		  and TABLE_NAME = ?`)
 	defer stmt.Close()
-	rows, _ := stmt.Query("demodb")
+	rows, _ := stmt.Query("demodb", table.PhysicalName)
 	defer rows.Close()
 	var tableName string
 	var nonUnique string
 	var indexName string
 	var colName string
+	var oldIndexName string
+	var index model.Index
+	flag := false
 	for rows.Next() {
 		rows.Scan(&tableName, &nonUnique, &indexName, &colName)
-		fmt.Print("tableName = ", tableName)
-		fmt.Print(", indexName = ", indexName)
-		fmt.Println(", colName = ", colName)
+		if indexName == "PRIMARY" {
+			col := colMap[colName]
+			col.PrimaryKey = true
+			table.PrimaryKeys = append(table.PrimaryKeys, col)
+			continue
+		}
+		if oldIndexName != indexName {
+			if flag {
+				if index.NonUnique {
+					table.Indexs = append(table.Indexs, index)
+				} else {
+					table.Uniques = append(table.Uniques, index)
+				}
+			}
+			flag = true
+			index = model.Index{Name: indexName}
+			index.NonUnique, _ = strconv.ParseBool(nonUnique)
+			index.Columns = make([]model.Column, 2)
+
+		}
+		index.Columns = append(index.Columns, colMap[colName])
+		oldIndexName = indexName
+	}
+	if index.NonUnique {
+		table.Indexs = append(table.Indexs, index)
+	} else {
+		table.Uniques = append(table.Uniques, index)
 	}
 }

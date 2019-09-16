@@ -6,6 +6,7 @@ type Table struct {
 	LogicalName  string
 	Description  string
 	Columns      []Column
+	PrimaryKeys  []Column
 	Indexs       []Index
 	Uniques      []Index
 }
@@ -24,6 +25,7 @@ type Column struct {
 	NotNull       bool
 	Description   string
 	Desc          bool
+	ColumnType    string
 }
 
 // Index 索引信息
@@ -33,12 +35,12 @@ type Index struct {
 	Columns   []Column
 }
 
-func NewTable(name string) Table {
+func NewTable(name string) *Table {
 	var tb = Table{
-		LogicalName: name,
+		PhysicalName: name,
 	}
 	tb.Columns = make([]Column, 8)
 	tb.Indexs = make([]Index, 1)
 	tb.Uniques = make([]Index, 1)
-	return tb
+	return &tb
 }

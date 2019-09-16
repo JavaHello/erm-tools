@@ -12,6 +12,9 @@ func main() {
 	tb := read.Read("tm_test")
 	fmt.Println(tb)
 
+	fmt.Println("-------------------------------------------------")
 	dbRead := core.NewDbRead()
 	dbRead.ReadAll("demodb")
+	tb = dbRead.Read("tm_test2")
+	fmt.Println(tb)
 }

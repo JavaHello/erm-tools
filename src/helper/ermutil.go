@@ -8,13 +8,13 @@ import (
 )
 
 // ErmToTable erm 转 table
-func ErmToTable(erm *model.Diagram, tableMap map[string]model.Table) {
+func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 	if erm == nil || tableMap == nil {
 		return
 	}
-	var wordMap = make(map[string]model.Word, 16)
+	var wordMap = make(map[string]*model.Word, 16)
 	for _, w := range erm.Dictionary.Words {
-		wordMap[w.Id] = w
+		wordMap[w.Id] = &w
 	}
 
 	for _, t := range erm.Contents.Table {
@@ -27,7 +27,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]model.Table) {
 		var mapCols = make(map[string]model.Column, 16)
 		for _, ermCol := range t.Columns.NormalColumn {
 			mapCol := wordMap[ermCol.WordId]
-			if mapCol == (model.Word{}) {
+			if mapCol == nil {
 				log.Println(t.PhysicalName + "表缺失字段")
 				continue
 			}
@@ -73,7 +73,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]model.Table) {
 				tb.Uniques = append(tb.Uniques, tbIdx)
 			}
 		}
-		tableMap[t.PhysicalName] = tb
+		tableMap[t.PhysicalName] = &tb
 	}
 
 }

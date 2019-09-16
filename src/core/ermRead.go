@@ -12,7 +12,7 @@ type ErmRead struct {
 }
 
 func NewErmRead() ErmRead {
-	return ErmRead{AbstractRead: AbstractRead{AllTable: make(map[string]model.Table, 16)}}
+	return ErmRead{AbstractRead: AbstractRead{AllTable: make(map[string]*model.Table, 16)}}
 }
 
 func (red *ErmRead) ReadAll(path string) {

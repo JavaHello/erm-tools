@@ -8,9 +8,9 @@ type IRead interface {
 }
 
 type AbstractRead struct {
-	AllTable map[string]model.Table
+	AllTable map[string]*model.Table
 }
 
 func (red *AbstractRead) Read(name string) model.Table {
-	return red.AllTable[name]
+	return *red.AllTable[name]
 }
