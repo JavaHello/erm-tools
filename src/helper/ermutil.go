@@ -26,8 +26,8 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 		tb.Uniques = make([]model.Index, 1)
 		var mapCols = make(map[string]model.Column, 16)
 		for _, ermCol := range t.Columns.NormalColumn {
-			mapCol := wordMap[ermCol.WordId]
-			if mapCol == nil {
+			mapCol, ok := wordMap[ermCol.WordId]
+			if !ok {
 				log.Println(t.PhysicalName + "表缺失字段")
 				continue
 			}
