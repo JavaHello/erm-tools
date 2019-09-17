@@ -2,6 +2,7 @@ package model
 
 type DiffTable struct {
 	Name        string
+	IsNew       bool
 	DiffColumns []DiffColumn
 	DiffIndexes []DiffIndex
 	DiffUniques []DiffIndex

@@ -15,6 +15,7 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 	oldGroupCols := groupColumns(oldCols)
 
 	diffTab := model.NewDiffTable(newTable.PhysicalName)
+	diffTab.IsNew = len(oldTable.Columns) == 0
 	for _, newCol := range newCols {
 		var diffCol model.DiffColumn
 		diffCol.Name = newCol.PhysicalName
