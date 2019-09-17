@@ -17,8 +17,8 @@ type DiffColumn struct {
 
 type DiffIndex struct {
 	Name     string
-	OldIndex *Column
-	NewIndex *Column
+	OldIndex *Index
+	NewIndex *Index
 }
 
 func NewDiffTable(name string) DiffTable {

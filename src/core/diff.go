@@ -1,6 +1,10 @@
 package core
 
-import "erm-tools/src/model"
+import (
+	"erm-tools/src/model"
+	"sort"
+	"strings"
+)
 
 type TableDiff struct {
 }
@@ -41,30 +45,81 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 		diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 	}
 
-	// 主键索引比较
+	// 主键比较
 	newPks := newTable.PrimaryKeys
 	oldPks := oldTable.PrimaryKeys
 
 	oldGroupPks := groupColumns(oldPks)
 
 	for _, newPk := range newPks {
-		var diffCol model.DiffColumn
-		diffCol.Name = newPk.PhysicalName
+		var diffPk model.DiffColumn
+		diffPk.Name = newPk.PhysicalName
 		_, ok := oldGroupPks[newPk.PhysicalName]
 		delete(oldGroupPks, newPk.PhysicalName)
 		if !ok {
-			diffCol.NewColumn = &newPk
-			diffTab.DiffColumns = append(diffTab.DiffPks, diffCol)
+			diffPk.NewColumn = &newPk
+			diffTab.DiffPks = append(diffTab.DiffPks, diffPk)
 		}
 	}
 	for _, oldPk := range oldGroupPks {
-		var diffCol model.DiffColumn
-		diffCol.Name = oldPk.PhysicalName
-		diffCol.OldColumn = &oldPk
-		diffTab.DiffColumns = append(diffTab.DiffPks, diffCol)
+		var diffPk model.DiffColumn
+		diffPk.Name = oldPk.PhysicalName
+		diffPk.OldColumn = &oldPk
+		diffTab.DiffPks = append(diffTab.DiffPks, diffPk)
 	}
 
+	// 索引比较
+	diffIndexes(newTable.Indexs, newTable.Indexs, &diffTab, false)
+	diffIndexes(newTable.Uniques, newTable.Uniques, &diffTab, true)
+
 	return diffTab
+}
+
+// 索引比较
+func diffIndexes(newIdxes, oldIdxes []model.Index, diffTab *model.DiffTable, uk bool) {
+	oldGroupIdxes := groupIndex(oldIdxes)
+	for _, newIdx := range newIdxes {
+		var diffIdx model.DiffIndex
+		diffIdx.Name = newIdx.Name
+		newKey := columnsName(newIdx.Columns)
+		_, ok := oldGroupIdxes[newKey]
+		delete(oldGroupIdxes, newKey)
+		if !ok {
+			diffIdx.NewIndex = &newIdx
+			if uk {
+				diffTab.DiffUniques = append(diffTab.DiffUniques, diffIdx)
+			} else {
+				diffTab.DiffIndexes = append(diffTab.DiffIndexes, diffIdx)
+			}
+		}
+	}
+	for _, oldIdx := range oldGroupIdxes {
+		var diffIdx model.DiffIndex
+		diffIdx.Name = oldIdx.Name
+		diffIdx.OldIndex = &oldIdx
+		if uk {
+			diffTab.DiffUniques = append(diffTab.DiffUniques, diffIdx)
+		} else {
+			diffTab.DiffIndexes = append(diffTab.DiffIndexes, diffIdx)
+		}
+	}
+}
+
+func groupIndex(idxes []model.Index) map[string]model.Index {
+	var res = map[string]model.Index{}
+	for _, idx := range idxes {
+		res[idx.Name] = idx
+	}
+	return res
+}
+
+func columnsName(cols []model.Column) string {
+	var names []string
+	for _, col := range cols {
+		names = append(names, col.PhysicalName)
+	}
+	sort.Strings(names)
+	return strings.Join(names, ",")
 }
 
 func groupColumns(cols []model.Column) map[string]model.Column {
