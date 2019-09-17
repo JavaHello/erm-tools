@@ -39,8 +39,8 @@ func NewTable(name string) *Table {
 	var tb = Table{
 		PhysicalName: name,
 	}
-	tb.Columns = make([]Column, 8)
-	tb.Indexs = make([]Index, 1)
-	tb.Uniques = make([]Index, 1)
+	tb.Columns = []Column{}
+	tb.Indexs = []Index{}
+	tb.Uniques = []Index{}
 	return &tb
 }

@@ -9,11 +9,13 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// DbRead 读取数据库表结构
 type DbRead struct {
 	AbstractRead
 	database *sql.DB
 }
 
+// NewDbRead 创建 DbRead
 func NewDbRead() DbRead {
 	return DbRead{AbstractRead: AbstractRead{AllTable: make(map[string]*model.Table, 16)}}
 }
@@ -29,6 +31,7 @@ func (read *DbRead) db() *sql.DB {
 	return read.database
 }
 
+// ReadAll 读取所有数据库表结构
 func (red *DbRead) ReadAll(dbname string) {
 	red.readTable("tm_test2")
 }
@@ -69,7 +72,7 @@ func (read *DbRead) readTable(name string) {
 	var extra string
 	var defval string
 	var col model.Column
-	var colMap = make(map[string]model.Column, 8)
+	var colMap = map[string]model.Column{}
 	for rows.Next() {
 		rows.Scan(&tableName, &colName, &isNull, &dataType, &charLen, &numLen, &numScale, &colComment, &colType, &extra, &defval)
 		col.PhysicalName = colName
@@ -135,7 +138,7 @@ func (red *DbRead) readIndex(table *model.Table, colMap map[string]model.Column)
 			flag = true
 			index = model.Index{Name: indexName}
 			index.NonUnique, _ = strconv.ParseBool(nonUnique)
-			index.Columns = make([]model.Column, 2)
+			index.Columns = []model.Column{}
 
 		}
 		index.Columns = append(index.Columns, colMap[colName])

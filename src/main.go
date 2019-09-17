@@ -9,12 +9,13 @@ import (
 func main() {
 	read := core.NewErmRead()
 	read.ReadAll(`D:\workspace\JavaProjects\demo\src\main\resources\db.erm`)
-	tb := read.Read("tm_test")
-	fmt.Println(tb)
 
-	fmt.Println("-------------------------------------------------")
-	dbRead := core.NewDbRead()
-	dbRead.ReadAll("demodb")
-	tb = dbRead.Read("tm_test2")
-	fmt.Println(tb)
+	ermRead := core.NewErmRead()
+	ermRead.ReadAll(`D:\workspace\JavaProjects\demo\src\main\resources\db2.erm`)
+
+	diff := core.TableDiff{}
+	for _, newTab := range read.AllTable {
+		diffTab := diff.Diff(ermRead.Read(newTab.PhysicalName), newTab)
+		fmt.Println(diffTab)
+	}
 }

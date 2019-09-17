@@ -3,6 +3,7 @@ package helper
 import (
 	"log"
 	"strconv"
+	"strings"
 
 	"erm-tools/src/model"
 )
@@ -12,19 +13,19 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 	if erm == nil || tableMap == nil {
 		return
 	}
-	var wordMap = make(map[string]*model.Word, 16)
+	var wordMap = make(map[string]model.Word, 16)
 	for _, w := range erm.Dictionary.Words {
-		wordMap[w.Id] = &w
+		wordMap[w.Id] = w
 	}
 
 	for _, t := range erm.Contents.Table {
 		var tb = model.Table{PhysicalName: t.PhysicalName,
 			LogicalName: t.LogicalName,
 			Description: t.Description}
-		tb.Columns = make([]model.Column, 8)
-		tb.Indexs = make([]model.Index, 1)
-		tb.Uniques = make([]model.Index, 1)
-		var mapCols = make(map[string]model.Column, 16)
+		tb.Columns = []model.Column{}
+		tb.Indexs = []model.Index{}
+		tb.Uniques = []model.Index{}
+		var mapCols = map[string]model.Column{}
 		for _, ermCol := range t.Columns.NormalColumn {
 			mapCol, ok := wordMap[ermCol.WordId]
 			if !ok {
@@ -51,6 +52,15 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 			if col.UniqueKey {
 				createColUniqueKey(&col, &tb)
 			}
+			// erm int 没有设置长度
+			if col.Type == "int" || col.Type == "integer" {
+				col.Length = 10
+			}
+
+			// TODO 拆分 varchar(n) 这种类型
+			if strings.Contains(col.Type, "(") {
+				col.Type = col.Type[:strings.Index(col.Type, "(")]
+			}
 
 			tb.Columns = append(tb.Columns, col)
 			mapCols[ermCol.Id] = col
@@ -61,7 +71,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 			nonunique, _ := strconv.ParseBool(idxes.NonUnique)
 			tbIdx := model.Index{Name: idxes.Name,
 				NonUnique: nonunique}
-			tbIdx.Columns = make([]model.Column, 1)
+			tbIdx.Columns = []model.Column{}
 			for _, idxCol := range idxes.Columns.Column {
 				tbCol := mapCols[idxCol.Id]
 				tbCol.Desc, _ = strconv.ParseBool(idxCol.Desc)
