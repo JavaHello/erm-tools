@@ -18,18 +18,25 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 		var diffCol model.DiffColumn
 		diffCol.Name = newCol.PhysicalName
 		oldCol, ok := oldGroupCols[newCol.PhysicalName]
+		delete(oldGroupCols, newCol.PhysicalName)
+
 		if !ok {
-			diffCol.NewColumn = newCol
+			diffCol.NewColumn = &newCol
 			diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 			continue
 		}
 		if newCol.Type != oldCol.Type || newCol.Length != oldCol.Length || newCol.Decimal != oldCol.Decimal {
-			diffCol.NewColumn = newCol
-			diffCol.OldColumn = oldCol
+			diffCol.NewColumn = &newCol
+			diffCol.OldColumn = &oldCol
 			diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 			continue
 		}
-
+	}
+	for _, oldCol := range oldGroupCols {
+		var diffCol model.DiffColumn
+		diffCol.Name = oldCol.PhysicalName
+		diffCol.OldColumn = &oldCol
+		diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 	}
 
 	return diffTab

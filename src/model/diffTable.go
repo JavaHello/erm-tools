@@ -10,14 +10,14 @@ type DiffTable struct {
 
 type DiffColumn struct {
 	Name      string
-	OldColumn Column
-	NewColumn Column
+	OldColumn *Column
+	NewColumn *Column
 }
 
 type DiffIndex struct {
 	Name     string
-	OldIndex Column
-	NewIndex Column
+	OldIndex *Column
+	NewIndex *Column
 }
 
 func NewDiffTable(name string) DiffTable {
