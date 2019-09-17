@@ -89,7 +89,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 }
 
 func createColUniqueKey(column *model.Column, table *model.Table) {
-	tbIdx := model.Index{Name: "idxes",
+	tbIdx := model.Index{Name: "UniqueKey",
 		NonUnique: true}
 	tbIdx.Columns = append(tbIdx.Columns, *column)
 	table.Uniques = append(table.Uniques, tbIdx)
