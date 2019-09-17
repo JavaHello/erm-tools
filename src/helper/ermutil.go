@@ -25,6 +25,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 		tb.Columns = []model.Column{}
 		tb.Indexs = []model.Index{}
 		tb.Uniques = []model.Index{}
+		tb.PrimaryKeys = []model.Column{}
 		var mapCols = map[string]model.Column{}
 		for _, ermCol := range t.Columns.NormalColumn {
 			mapCol, ok := wordMap[ermCol.WordId]
@@ -41,6 +42,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 			col.AutoIncrement, _ = strconv.ParseBool(ermCol.AutoIncrement)
 			col.PrimaryKey, _ = strconv.ParseBool(ermCol.PrimaryKey)
 			col.UniqueKey, _ = strconv.ParseBool(ermCol.UniqueKey)
+			col.PrimaryKey, _ = strconv.ParseBool(ermCol.PrimaryKey)
 			if mapCol.Length != "" {
 				l, _ := strconv.Atoi(mapCol.Length)
 				col.Length = int8(l)
@@ -48,6 +50,9 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 			if mapCol.Decimal != "" {
 				l, _ := strconv.Atoi(mapCol.Decimal)
 				col.Decimal = int8(l)
+			}
+			if col.PrimaryKey {
+				tb.PrimaryKeys = append(tb.PrimaryKeys, col)
 			}
 			if col.UniqueKey {
 				createColUniqueKey(&col, &tb)
