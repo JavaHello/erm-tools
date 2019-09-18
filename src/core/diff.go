@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 )
+
 // TableDiff 差异比较
 type TableDiff struct {
 }
@@ -24,15 +25,16 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 		var diffCol model.DiffColumn
 		diffCol.Name = newCol.PhysicalName
 		oldCol, ok := oldGroupCols[newCol.PhysicalName]
+		var newTmp = newCol
 		delete(oldGroupCols, newCol.PhysicalName)
 
 		if !ok {
-			diffCol.NewColumn = &newCol
+			diffCol.NewColumn = &newTmp
 			diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 			continue
 		}
 		if newCol.Type != oldCol.Type || newCol.Length != oldCol.Length || newCol.Decimal != oldCol.Decimal {
-			diffCol.NewColumn = &newCol
+			diffCol.NewColumn = &newTmp
 			diffCol.OldColumn = &oldCol
 			diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 			continue
