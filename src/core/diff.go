@@ -25,17 +25,16 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 		var diffCol model.DiffColumn
 		diffCol.Name = newCol.PhysicalName
 		oldCol, ok := oldGroupCols[newCol.PhysicalName]
-		var newTmp = newCol
 		delete(oldGroupCols, newCol.PhysicalName)
 
 		if !ok {
-			diffCol.NewColumn = &newTmp
+			diffCol.NewColumn = newCol
 			diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 			continue
 		}
 		if newCol.Type != oldCol.Type || newCol.Length != oldCol.Length || newCol.Decimal != oldCol.Decimal {
-			diffCol.NewColumn = &newTmp
-			diffCol.OldColumn = &oldCol
+			diffCol.NewColumn = newCol
+			diffCol.OldColumn = oldCol
 			diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 			continue
 		}
@@ -43,7 +42,7 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 	for _, oldCol := range oldGroupCols {
 		var diffCol model.DiffColumn
 		diffCol.Name = oldCol.PhysicalName
-		diffCol.OldColumn = &oldCol
+		diffCol.OldColumn = oldCol
 		diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 	}
 
@@ -59,14 +58,14 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 		_, ok := oldGroupPks[newPk.PhysicalName]
 		delete(oldGroupPks, newPk.PhysicalName)
 		if !ok {
-			diffPk.NewColumn = &newPk
+			diffPk.NewColumn = newPk
 			diffTab.DiffPks = append(diffTab.DiffPks, diffPk)
 		}
 	}
 	for _, oldPk := range oldGroupPks {
 		var diffPk model.DiffColumn
 		diffPk.Name = oldPk.PhysicalName
-		diffPk.OldColumn = &oldPk
+		diffPk.OldColumn = oldPk
 		diffTab.DiffPks = append(diffTab.DiffPks, diffPk)
 	}
 
@@ -78,7 +77,7 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 }
 
 // 索引比较
-func diffIndexes(newIdxes, oldIdxes []model.Index, diffTab *model.DiffTable, uk bool) {
+func diffIndexes(newIdxes, oldIdxes []*model.Index, diffTab *model.DiffTable, uk bool) {
 	oldGroupIdxes := groupIndex(oldIdxes)
 	for _, newIdx := range newIdxes {
 		var diffIdx model.DiffIndex
@@ -87,7 +86,7 @@ func diffIndexes(newIdxes, oldIdxes []model.Index, diffTab *model.DiffTable, uk 
 		_, ok := oldGroupIdxes[newKey]
 		delete(oldGroupIdxes, newKey)
 		if !ok {
-			diffIdx.NewIndex = &newIdx
+			diffIdx.NewIndex = newIdx
 			if uk {
 				diffTab.DiffUniques = append(diffTab.DiffUniques, diffIdx)
 			} else {
@@ -98,7 +97,7 @@ func diffIndexes(newIdxes, oldIdxes []model.Index, diffTab *model.DiffTable, uk 
 	for _, oldIdx := range oldGroupIdxes {
 		var diffIdx model.DiffIndex
 		diffIdx.Name = oldIdx.Name
-		diffIdx.OldIndex = &oldIdx
+		diffIdx.OldIndex = oldIdx
 		if uk {
 			diffTab.DiffUniques = append(diffTab.DiffUniques, diffIdx)
 		} else {
@@ -107,15 +106,15 @@ func diffIndexes(newIdxes, oldIdxes []model.Index, diffTab *model.DiffTable, uk 
 	}
 }
 
-func groupIndex(idxes []model.Index) map[string]model.Index {
-	var res = map[string]model.Index{}
+func groupIndex(idxes []*model.Index) (res map[string]*model.Index) {
+	res = map[string]*model.Index{}
 	for _, idx := range idxes {
 		res[idx.Name] = idx
 	}
 	return res
 }
 
-func columnsName(cols []model.Column) string {
+func columnsName(cols []*model.Column) string {
 	var names []string
 	for _, col := range cols {
 		names = append(names, col.PhysicalName)
@@ -124,8 +123,8 @@ func columnsName(cols []model.Column) string {
 	return strings.Join(names, ",")
 }
 
-func groupColumns(cols []model.Column) map[string]model.Column {
-	var res = map[string]model.Column{}
+func groupColumns(cols []*model.Column) (res map[string]*model.Column) {
+	res = map[string]*model.Column{}
 	for _, col := range cols {
 		res[col.PhysicalName] = col
 	}

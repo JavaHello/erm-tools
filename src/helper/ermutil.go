@@ -22,10 +22,10 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 		var tb = model.Table{PhysicalName: t.PhysicalName,
 			LogicalName: t.LogicalName,
 			Description: t.Description}
-		tb.Columns = []model.Column{}
-		tb.Indexs = []model.Index{}
-		tb.Uniques = []model.Index{}
-		tb.PrimaryKeys = []model.Column{}
+		tb.Columns = []*model.Column{}
+		tb.Indexs = []*model.Index{}
+		tb.Uniques = []*model.Index{}
+		tb.PrimaryKeys = []*model.Column{}
 		var mapCols = map[string]model.Column{}
 		for _, ermCol := range t.Columns.NormalColumn {
 			mapCol, ok := wordMap[ermCol.WordId]
@@ -52,7 +52,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 				col.Decimal = int(l)
 			}
 			if col.PrimaryKey {
-				tb.PrimaryKeys = append(tb.PrimaryKeys, col)
+				tb.PrimaryKeys = append(tb.PrimaryKeys, &col)
 			}
 			if col.UniqueKey {
 				createColUniqueKey(&col, &tb)
@@ -67,7 +67,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 				col.Type = col.Type[:strings.Index(col.Type, "(")]
 			}
 
-			tb.Columns = append(tb.Columns, col)
+			tb.Columns = append(tb.Columns, &col)
 			mapCols[ermCol.Id] = col
 
 		}
@@ -76,16 +76,16 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 			nonunique, _ := strconv.ParseBool(idxes.NonUnique)
 			tbIdx := model.Index{Name: idxes.Name,
 				NonUnique: nonunique}
-			tbIdx.Columns = []model.Column{}
+			tbIdx.Columns = []*model.Column{}
 			for _, idxCol := range idxes.Columns.Column {
 				tbCol := mapCols[idxCol.Id]
 				tbCol.Desc, _ = strconv.ParseBool(idxCol.Desc)
-				tbIdx.Columns = append(tbIdx.Columns, tbCol)
+				tbIdx.Columns = append(tbIdx.Columns, &tbCol)
 			}
 			if nonunique {
-				tb.Indexs = append(tb.Indexs, tbIdx)
+				tb.Indexs = append(tb.Indexs, &tbIdx)
 			} else {
-				tb.Uniques = append(tb.Uniques, tbIdx)
+				tb.Uniques = append(tb.Uniques, &tbIdx)
 			}
 		}
 		tableMap[t.PhysicalName] = &tb
@@ -96,6 +96,6 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 func createColUniqueKey(column *model.Column, table *model.Table) {
 	tbIdx := model.Index{Name: "UniqueKey",
 		NonUnique: true}
-	tbIdx.Columns = append(tbIdx.Columns, *column)
-	table.Uniques = append(table.Uniques, tbIdx)
+	tbIdx.Columns = append(tbIdx.Columns, column)
+	table.Uniques = append(table.Uniques, &tbIdx)
 }

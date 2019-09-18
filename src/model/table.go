@@ -5,10 +5,10 @@ type Table struct {
 	PhysicalName string
 	LogicalName  string
 	Description  string
-	Columns      []Column
-	PrimaryKeys  []Column
-	Indexs       []Index
-	Uniques      []Index
+	Columns      []*Column
+	PrimaryKeys  []*Column
+	Indexs       []*Index
+	Uniques      []*Index
 }
 
 // Column 字段信息
@@ -32,15 +32,15 @@ type Column struct {
 type Index struct {
 	Name      string
 	NonUnique bool
-	Columns   []Column
+	Columns   []*Column
 }
 
 func NewTable(name string) *Table {
 	var tb = Table{
 		PhysicalName: name,
 	}
-	tb.Columns = []Column{}
-	tb.Indexs = []Index{}
-	tb.Uniques = []Index{}
+	tb.Columns = []*Column{}
+	tb.Indexs = []*Index{}
+	tb.Uniques = []*Index{}
 	return &tb
 }

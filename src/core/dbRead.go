@@ -72,7 +72,7 @@ func (read *DbRead) readTable(name string) {
 	var extra string
 	var defval string
 	var col model.Column
-	var colMap = map[string]model.Column{}
+	var colMap = map[string]*model.Column{}
 	for rows.Next() {
 		rows.Scan(&tableName, &colName, &isNull, &dataType, &charLen, &numLen, &numScale, &colComment, &colType, &extra, &defval)
 		col.PhysicalName = colName
@@ -95,14 +95,14 @@ func (read *DbRead) readTable(name string) {
 		}
 		col.NotNull = isNull == "NO"
 		col.ColumnType = colType
-		tb.Columns = append(tb.Columns, col)
-		colMap[colName] = col
+		tb.Columns = append(tb.Columns, &col)
+		colMap[colName] = &col
 	}
 	read.readIndex(tb, colMap)
 	read.AllTable[tb.PhysicalName] = tb
 }
 
-func (red *DbRead) readIndex(table *model.Table, colMap map[string]model.Column) {
+func (red *DbRead) readIndex(table *model.Table, colMap map[string]*model.Column) {
 	db := red.db()
 	stmt, _ := db.Prepare(
 		`select TABLE_NAME, NON_UNIQUE, INDEX_NAME, COLUMN_NAME
@@ -130,23 +130,23 @@ func (red *DbRead) readIndex(table *model.Table, colMap map[string]model.Column)
 		if oldIndexName != indexName {
 			if flag {
 				if index.NonUnique {
-					table.Indexs = append(table.Indexs, index)
+					table.Indexs = append(table.Indexs, &index)
 				} else {
-					table.Uniques = append(table.Uniques, index)
+					table.Uniques = append(table.Uniques, &index)
 				}
 			}
 			flag = true
 			index = model.Index{Name: indexName}
 			index.NonUnique, _ = strconv.ParseBool(nonUnique)
-			index.Columns = []model.Column{}
+			index.Columns = []*model.Column{}
 
 		}
 		index.Columns = append(index.Columns, colMap[colName])
 		oldIndexName = indexName
 	}
 	if index.NonUnique {
-		table.Indexs = append(table.Indexs, index)
+		table.Indexs = append(table.Indexs, &index)
 	} else {
-		table.Uniques = append(table.Uniques, index)
+		table.Uniques = append(table.Uniques, &index)
 	}
 }
