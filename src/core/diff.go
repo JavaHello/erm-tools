@@ -69,8 +69,8 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 	}
 
 	// 索引比较
-	diffIndexes(newTable.Indexs, newTable.Indexs, &diffTab, false)
-	diffIndexes(newTable.Uniques, newTable.Uniques, &diffTab, true)
+	diffIndexes(newTable.Indexs, oldTable.Indexs, &diffTab, false)
+	diffIndexes(newTable.Uniques, oldTable.Uniques, &diffTab, true)
 
 	return diffTab
 }
