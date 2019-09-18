@@ -37,7 +37,8 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 				PhysicalName: mapCol.PhysicalName,
 				LogicalName:  mapCol.LogicalName,
 				Description:  mapCol.Description,
-				Type:         mapCol.Type}
+				Type:         mapCol.Type,
+				ColumnType:   mapCol.Type}
 			col.NotNull, _ = strconv.ParseBool(ermCol.NotNull)
 			col.AutoIncrement, _ = strconv.ParseBool(ermCol.AutoIncrement)
 			col.PrimaryKey, _ = strconv.ParseBool(ermCol.PrimaryKey)
@@ -62,7 +63,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 				col.Length = 10
 			}
 
-			// TODO 拆分 varchar(n) 这种类型
+			// 拆分 varchar(n) 这种类型
 			if strings.Contains(col.Type, "(") {
 				col.Type = col.Type[:strings.Index(col.Type, "(")]
 			}
