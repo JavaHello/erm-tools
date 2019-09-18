@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 )
-
+// TableDiff 差异比较
 type TableDiff struct {
 }
 

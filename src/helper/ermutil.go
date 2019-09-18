@@ -45,11 +45,11 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 			col.PrimaryKey, _ = strconv.ParseBool(ermCol.PrimaryKey)
 			if mapCol.Length != "" {
 				l, _ := strconv.Atoi(mapCol.Length)
-				col.Length = int8(l)
+				col.Length = int(l)
 			}
 			if mapCol.Decimal != "" {
 				l, _ := strconv.Atoi(mapCol.Decimal)
-				col.Decimal = int8(l)
+				col.Decimal = int(l)
 			}
 			if col.PrimaryKey {
 				tb.PrimaryKeys = append(tb.PrimaryKeys, col)

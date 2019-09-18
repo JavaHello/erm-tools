@@ -21,3 +21,8 @@ func (red *AbstractRead) Read(name string) *model.Table {
 type IDiff interface {
 	Diff(oldTable *model.Table, newTable *model.Table) model.DiffTable
 }
+
+// IDiffOut 差异写出到文件
+type IDiffOut interface {
+	Writer(diffTables []model.DiffTable)
+}

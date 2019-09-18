@@ -18,8 +18,8 @@ type Column struct {
 	Type          string
 	AutoIncrement bool
 	DefaultValue  string
-	Length        int8
-	Decimal       int8
+	Length        int
+	Decimal       int
 	PrimaryKey    bool
 	UniqueKey     bool
 	NotNull       bool

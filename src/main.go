@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"erm-tools/src/core"
+	"erm-tools/src/model"
 )
 
 func main() {
@@ -14,8 +15,12 @@ func main() {
 	ermRead.ReadAll(`D:\workspace\JavaProjects\demo\src\main\resources\db2.erm`)
 
 	diff := core.TableDiff{}
+	var diffTables []model.DiffTable
 	for _, newTab := range read.AllTable {
 		diffTab := diff.Diff(ermRead.Read(newTab.PhysicalName), newTab)
 		fmt.Println(diffTab)
+		diffTables = append(diffTables, diffTab)
 	}
+	out := core.MdOut{OutPath: "D:\\workspace\\GoProjects\\erm-tools\\diff.md"}
+	out.Writer(diffTables)
 }

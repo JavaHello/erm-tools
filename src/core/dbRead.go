@@ -81,14 +81,14 @@ func (read *DbRead) readTable(name string) {
 		col.DefaultValue = defval
 		if charLen != "" && charLen != "null" {
 			l, _ := strconv.Atoi(charLen)
-			col.Length = int8(l)
+			col.Length = int(l)
 		} else if numLen != "" && numLen != "null" {
 			l, _ := strconv.Atoi(numLen)
-			col.Length = int8(l)
+			col.Length = int(l)
 		}
 		if numScale != "" && numScale != "null" {
 			l, _ := strconv.Atoi(numScale)
-			col.Decimal = int8(l)
+			col.Decimal = int(l)
 		}
 		if extra == "auto_increment" {
 			col.AutoIncrement = true
