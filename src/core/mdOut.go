@@ -1,10 +1,12 @@
 package core
 
 import (
+	"erm-tools/src/helper"
 	"erm-tools/src/model"
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -14,7 +16,7 @@ const (
 `
 	idxTitle = `
 |old名称|old字段||new名称|new字段|索引类型|
-|:-:|:-:||:-:|:-:|:-:|
+|:-:|:-:|:-:|:-:|:-:|:-:|
 `
 )
 
@@ -37,6 +39,7 @@ func (out *MdOut) Writer(diffTables []model.DiffTable) {
 	}()
 	for _, diffTab := range diffTables {
 		out.colDiff(diffTab)
+		out.idxDiff(diffTab)
 	}
 }
 
@@ -64,4 +67,57 @@ func (out *MdOut) colDiff(diffTable model.DiffTable) {
 		colMd = oldMd + "|" + newMd + "\n"
 		out.diffFile.WriteString(colMd)
 	}
+}
+
+func (out *MdOut) idxDiff(diffTab model.DiffTable) {
+	idxFlag := len(diffTab.DiffIndexes) > 0 || len(diffTab.DiffUniques) > 0 || len(diffTab.DiffPks) > 0
+	if idxFlag {
+		out.diffFile.WriteString("# " + diffTab.Name + " 索引差异\n")
+		out.diffFile.WriteString(idxTitle)
+	}
+	if len(diffTab.DiffPks) > 0 {
+		var oldPks []string
+		var newPks []string
+		for _, pk := range diffTab.DiffPks {
+			oldPks = appendColName(pk.OldColumn, oldPks)
+			newPks = appendColName(pk.NewColumn, newPks)
+		}
+		out.diffFile.WriteString("|PRIMARY|" + strings.Join(oldPks, ", ||") + "|PRIMARY|" + strings.Join(newPks, ", |主键|\n"))
+	}
+	out.indexDiff(diffTab.DiffUniques, true)
+	out.indexDiff(diffTab.DiffIndexes, false)
+
+}
+func (out *MdOut) indexDiff(diffIdx []model.DiffIndex, uk bool) {
+	var idxType string
+	if uk {
+		idxType = "唯一索引"
+	} else {
+		idxType = "索引"
+	}
+	for _, idx := range diffIdx {
+
+		var oldName string
+		var newName string
+		var oldColName string
+		var newColName string
+
+		if idx.OldIndex != nil {
+			oldName = idx.OldIndex.Name
+			oldColName = helper.ColumnsName(idx.OldIndex.Columns)
+		}
+		if idx.NewIndex != nil {
+			newName = idx.NewIndex.Name
+			newColName = helper.ColumnsName(idx.NewIndex.Columns)
+		}
+
+		out.diffFile.WriteString("|" + oldName + "|" + oldColName + "||" + newName + "|" + newColName + "|" + idxType + "|\n")
+	}
+}
+
+func appendColName(col *model.Column, nameList []string) []string {
+	if col != nil {
+		return append(nameList, col.PhysicalName)
+	}
+	return nameList
 }

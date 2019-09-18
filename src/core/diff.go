@@ -1,9 +1,8 @@
 package core
 
 import (
+	"erm-tools/src/helper"
 	"erm-tools/src/model"
-	"sort"
-	"strings"
 )
 
 // TableDiff 差异比较
@@ -82,7 +81,7 @@ func diffIndexes(newIdxes, oldIdxes []*model.Index, diffTab *model.DiffTable, uk
 	for _, newIdx := range newIdxes {
 		var diffIdx model.DiffIndex
 		diffIdx.Name = newIdx.Name
-		newKey := columnsName(newIdx.Columns)
+		newKey := helper.ColumnsName(newIdx.Columns)
 		_, ok := oldGroupIdxes[newKey]
 		delete(oldGroupIdxes, newKey)
 		if !ok {
@@ -112,15 +111,6 @@ func groupIndex(idxes []*model.Index) (res map[string]*model.Index) {
 		res[idx.Name] = idx
 	}
 	return res
-}
-
-func columnsName(cols []*model.Column) string {
-	var names []string
-	for _, col := range cols {
-		names = append(names, col.PhysicalName)
-	}
-	sort.Strings(names)
-	return strings.Join(names, ",")
 }
 
 func groupColumns(cols []*model.Column) (res map[string]*model.Column) {
