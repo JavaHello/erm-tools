@@ -23,4 +23,6 @@ func main() {
 	}
 	out := core.MdOut{OutPath: "D:\\workspace\\GoProjects\\erm-tools\\diff.md"}
 	out.Writer(diffTables)
+	ddlOut := core.DdlOut{OutPath: "D:\\workspace\\GoProjects\\erm-tools\\gen.sql"}
+	ddlOut.Writer(diffTables)
 }

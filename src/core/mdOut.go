@@ -1,7 +1,6 @@
 package core
 
 import (
-	"erm-tools/src/helper"
 	"erm-tools/src/model"
 	"log"
 	"os"
@@ -15,8 +14,8 @@ const (
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 `
 	idxTitle = `
-|old名称|old字段||new名称|new字段|索引类型|
-|:-:|:-:|:-:|:-:|:-:|:-:|
+|old名称|old字段|old索引类型||new名称|new字段|new索引类型|
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 `
 )
 
@@ -27,7 +26,7 @@ type MdOut struct {
 
 func (out *MdOut) Writer(diffTables []model.DiffTable) {
 	if fp, err := os.Create(out.OutPath); err != nil {
-		log.Println("创建文件失败", out.OutPath, err)
+		log.Println("创建DIFF文件失败", out.OutPath, err)
 		return
 	} else {
 		out.diffFile = fp
@@ -70,7 +69,7 @@ func (out *MdOut) colDiff(diffTable model.DiffTable) {
 }
 
 func (out *MdOut) idxDiff(diffTab model.DiffTable) {
-	idxFlag := len(diffTab.DiffIndexes) > 0 || len(diffTab.DiffUniques) > 0 || len(diffTab.DiffPks) > 0
+	idxFlag := len(diffTab.DiffIndexes) > 0 || len(diffTab.DiffPks) > 0
 	if idxFlag {
 		out.diffFile.WriteString("# " + diffTab.Name + " 索引差异\n")
 		out.diffFile.WriteString(idxTitle)
@@ -82,21 +81,17 @@ func (out *MdOut) idxDiff(diffTab model.DiffTable) {
 			oldPks = appendColName(pk.OldColumn, oldPks)
 			newPks = appendColName(pk.NewColumn, newPks)
 		}
-		out.diffFile.WriteString("|PRIMARY|" + strings.Join(oldPks, ", ||") + "|PRIMARY|" + strings.Join(newPks, ", |主键|\n"))
+		out.diffFile.WriteString("|PRIMARY|" + strings.Join(oldPks, ", ") + "|主键||PRIMARY|" + strings.Join(newPks, ", |主键|\n"))
 	}
-	out.indexDiff(diffTab.DiffUniques, true)
-	out.indexDiff(diffTab.DiffIndexes, false)
+	out.indexDiff(diffTab.DiffIndexes)
 
 }
-func (out *MdOut) indexDiff(diffIdx []model.DiffIndex, uk bool) {
-	var idxType string
-	if uk {
-		idxType = "唯一索引"
-	} else {
-		idxType = "索引"
-	}
+func (out *MdOut) indexDiff(diffIdx []model.DiffIndex) {
+
 	for _, idx := range diffIdx {
 
+		var oldIdxType string
+		var newIdxType string
 		var oldName string
 		var newName string
 		var oldColName string
@@ -104,14 +99,24 @@ func (out *MdOut) indexDiff(diffIdx []model.DiffIndex, uk bool) {
 
 		if idx.OldIndex != nil {
 			oldName = idx.OldIndex.Name
-			oldColName = helper.ColumnsName(idx.OldIndex.Columns)
+			oldColName = model.ColumnsName(idx.OldIndex.Columns)
+			if !idx.OldIndex.NonUnique {
+				oldIdxType = "唯一索引"
+			} else {
+				oldIdxType = "索引"
+			}
 		}
 		if idx.NewIndex != nil {
+			if !idx.NewIndex.NonUnique {
+				newIdxType = "唯一索引"
+			} else {
+				newIdxType = "索引"
+			}
 			newName = idx.NewIndex.Name
-			newColName = helper.ColumnsName(idx.NewIndex.Columns)
+			newColName = model.ColumnsName(idx.NewIndex.Columns)
 		}
 
-		out.diffFile.WriteString("|" + oldName + "|" + oldColName + "||" + newName + "|" + newColName + "|" + idxType + "|\n")
+		out.diffFile.WriteString("|" + oldName + "|" + oldColName + "|" + oldIdxType + "||" + newName + "|" + newColName + "|" + newIdxType + "|\n")
 	}
 }
 

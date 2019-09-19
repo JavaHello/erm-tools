@@ -1,7 +1,6 @@
 package core
 
 import (
-	"erm-tools/src/helper"
 	"erm-tools/src/model"
 )
 
@@ -69,39 +68,30 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 	}
 
 	// 索引比较
-	diffIndexes(newTable.Indexs, oldTable.Indexs, &diffTab, false)
-	diffIndexes(newTable.Uniques, oldTable.Uniques, &diffTab, true)
+	diffIndexes(newTable.Indexs, oldTable.Indexs, &diffTab)
 
 	return diffTab
 }
 
 // 索引比较
-func diffIndexes(newIdxes, oldIdxes []*model.Index, diffTab *model.DiffTable, uk bool) {
+func diffIndexes(newIdxes, oldIdxes []*model.Index, diffTab *model.DiffTable) {
 	oldGroupIdxes := groupIndex(oldIdxes)
 	for _, newIdx := range newIdxes {
 		var diffIdx model.DiffIndex
 		diffIdx.Name = newIdx.Name
-		newKey := helper.ColumnsName(newIdx.Columns)
+		newKey := model.ColumnsName(newIdx.Columns)
 		_, ok := oldGroupIdxes[newKey]
 		delete(oldGroupIdxes, newKey)
 		if !ok {
 			diffIdx.NewIndex = newIdx
-			if uk {
-				diffTab.DiffUniques = append(diffTab.DiffUniques, diffIdx)
-			} else {
-				diffTab.DiffIndexes = append(diffTab.DiffIndexes, diffIdx)
-			}
+			diffTab.DiffIndexes = append(diffTab.DiffIndexes, diffIdx)
 		}
 	}
 	for _, oldIdx := range oldGroupIdxes {
 		var diffIdx model.DiffIndex
 		diffIdx.Name = oldIdx.Name
 		diffIdx.OldIndex = oldIdx
-		if uk {
-			diffTab.DiffUniques = append(diffTab.DiffUniques, diffIdx)
-		} else {
-			diffTab.DiffIndexes = append(diffTab.DiffIndexes, diffIdx)
-		}
+		diffTab.DiffIndexes = append(diffTab.DiffIndexes, diffIdx)
 	}
 }
 

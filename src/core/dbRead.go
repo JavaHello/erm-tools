@@ -13,6 +13,10 @@ import (
 type DbRead struct {
 	AbstractRead
 	database *sql.DB
+	User     string
+	Pass     string
+	Host     string
+	Port     string
 }
 
 // NewDbRead 创建 DbRead
@@ -129,11 +133,7 @@ func (red *DbRead) readIndex(table *model.Table, colMap map[string]*model.Column
 		}
 		if oldIndexName != indexName {
 			if flag {
-				if index.NonUnique {
-					table.Indexs = append(table.Indexs, &index)
-				} else {
-					table.Uniques = append(table.Uniques, &index)
-				}
+				table.Indexs = append(table.Indexs, &index)
 			}
 			flag = true
 			index = model.Index{Name: indexName}
@@ -144,9 +144,5 @@ func (red *DbRead) readIndex(table *model.Table, colMap map[string]*model.Column
 		index.Columns = append(index.Columns, colMap[colName])
 		oldIndexName = indexName
 	}
-	if index.NonUnique {
-		table.Indexs = append(table.Indexs, &index)
-	} else {
-		table.Uniques = append(table.Uniques, &index)
-	}
+	table.Indexs = append(table.Indexs, &index)
 }

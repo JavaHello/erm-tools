@@ -5,7 +5,6 @@ type DiffTable struct {
 	IsNew       bool
 	DiffColumns []DiffColumn
 	DiffIndexes []DiffIndex
-	DiffUniques []DiffIndex
 	DiffPks     []DiffColumn
 }
 
@@ -22,5 +21,5 @@ type DiffIndex struct {
 }
 
 func NewDiffTable(name string) DiffTable {
-	return DiffTable{Name: name, DiffColumns: []DiffColumn{}, DiffIndexes: []DiffIndex{}, DiffUniques: []DiffIndex{}, DiffPks: []DiffColumn{}}
+	return DiffTable{Name: name, DiffColumns: []DiffColumn{}, DiffIndexes: []DiffIndex{}, DiffPks: []DiffColumn{}}
 }

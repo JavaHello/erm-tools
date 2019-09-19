@@ -24,7 +24,6 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 			Description: t.Description}
 		tb.Columns = []*model.Column{}
 		tb.Indexs = []*model.Index{}
-		tb.Uniques = []*model.Index{}
 		tb.PrimaryKeys = []*model.Column{}
 		var mapCols = map[string]model.Column{}
 		for _, ermCol := range t.Columns.NormalColumn {
@@ -62,10 +61,19 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 			if col.Type == "int" || col.Type == "integer" {
 				col.Length = 10
 			}
+			if strings.Contains(col.Type, "character(n)") {
+				col.Type = "varchar(n)"
+			}
 
 			// 拆分 varchar(n) 这种类型
 			if strings.Contains(col.Type, "(") {
 				col.Type = col.Type[:strings.Index(col.Type, "(")]
+				col.ColumnType = col.Type + "(" + strconv.Itoa(col.Length)
+				if col.Decimal > 0 {
+					col.ColumnType += ", " + strconv.Itoa(col.Decimal) + ")"
+				} else {
+					col.ColumnType += ")"
+				}
 			}
 
 			tb.Columns = append(tb.Columns, &col)
@@ -83,11 +91,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 				tbCol.Desc, _ = strconv.ParseBool(idxCol.Desc)
 				tbIdx.Columns = append(tbIdx.Columns, &tbCol)
 			}
-			if nonunique {
-				tb.Indexs = append(tb.Indexs, &tbIdx)
-			} else {
-				tb.Uniques = append(tb.Uniques, &tbIdx)
-			}
+			tb.Indexs = append(tb.Indexs, &tbIdx)
 		}
 		tableMap[t.PhysicalName] = &tb
 	}
@@ -98,5 +102,5 @@ func createColUniqueKey(column *model.Column, table *model.Table) {
 	tbIdx := model.Index{Name: "UniqueKey",
 		NonUnique: true}
 	tbIdx.Columns = append(tbIdx.Columns, column)
-	table.Uniques = append(table.Uniques, &tbIdx)
+	table.Indexs = append(table.Indexs, &tbIdx)
 }
