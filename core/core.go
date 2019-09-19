@@ -5,7 +5,7 @@ import "erm-tools/model"
 // IRead 读取表结构
 type IRead interface {
 	ReadAll(path string)
-	Read(tableName string) model.Table
+	Read(tableName string) *model.Table
 }
 
 // AbstractRead 获取单表结构的默认实现
@@ -24,5 +24,5 @@ type IDiff interface {
 
 // IDiffOut 差异写出到文件
 type IDiffOut interface {
-	Writer(diffTables []model.DiffTable)
+	Writer(diffTables []*model.DiffTable)
 }

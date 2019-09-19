@@ -11,8 +11,8 @@ type ErmRead struct {
 	AbstractRead
 }
 
-func NewErmRead() ErmRead {
-	return ErmRead{AbstractRead: AbstractRead{AllTable: map[string]*model.Table{}}}
+func NewErmRead() *ErmRead {
+	return &ErmRead{AbstractRead: AbstractRead{AllTable: map[string]*model.Table{}}}
 }
 
 func (red *ErmRead) ReadAll(path string) {

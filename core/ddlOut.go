@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	CREATE = "CREATE "
-	TABLE  = "TABLE "
-	LF     = "\n"
+	CREATE            = "CREATE "
+	TABLE             = "TABLE "
+	LF                = "\n"
+	ddlOutName string = "gen.sql"
 )
 
 type OptType string
@@ -26,20 +27,16 @@ type DdlOut struct {
 	outFile *os.File
 }
 
-func (out *DdlOut) Writer(diffTables []model.DiffTable) {
-	if fp, err := os.Create(out.OutPath); err != nil {
+func (out *DdlOut) Writer(diffTables []*model.DiffTable) {
+	if fp, err := os.Create(out.OutPath + string(os.PathSeparator) + ddlOutName); err != nil {
 		logger.Error.Println("创建DDL文件失败", out.OutPath, err)
 		return
 	} else {
 		out.outFile = fp
 	}
-	defer func() {
-		if out.outFile != nil {
-			out.outFile.Close()
-		}
-	}()
+	defer out.outFile.Close()
 	for _, diffTab := range diffTables {
-		out.genDdl(&diffTab)
+		out.genDdl(diffTab)
 	}
 }
 

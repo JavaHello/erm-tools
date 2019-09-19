@@ -20,8 +20,8 @@ type DbRead struct {
 }
 
 // NewDbRead 创建 DbRead
-func NewDbRead() DbRead {
-	return DbRead{AbstractRead: AbstractRead{AllTable: make(map[string]*model.Table, 16)}}
+func NewDbRead() *DbRead {
+	return &DbRead{AbstractRead: AbstractRead{AllTable: make(map[string]*model.Table, 16)}}
 }
 
 func (read *DbRead) db() *sql.DB {

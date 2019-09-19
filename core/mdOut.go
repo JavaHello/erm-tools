@@ -17,6 +17,7 @@ const (
 |old名称|old字段|old索引类型||new名称|new字段|new索引类型|
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 `
+	mdOutName = "diff.md"
 )
 
 type MdOut struct {
@@ -24,25 +25,21 @@ type MdOut struct {
 	diffFile *os.File
 }
 
-func (out *MdOut) Writer(diffTables []model.DiffTable) {
-	if fp, err := os.Create(out.OutPath); err != nil {
+func (out *MdOut) Writer(diffTables []*model.DiffTable) {
+	if fp, err := os.Create(out.OutPath + string(os.PathSeparator) + mdOutName); err != nil {
 		logger.Error.Println("创建DIFF文件失败", out.OutPath, err)
 		return
 	} else {
 		out.diffFile = fp
 	}
-	defer func() {
-		if out.diffFile != nil {
-			out.diffFile.Close()
-		}
-	}()
+	defer out.diffFile.Close()
 	for _, diffTab := range diffTables {
 		out.colDiff(diffTab)
 		out.idxDiff(diffTab)
 	}
 }
 
-func (out *MdOut) colDiff(diffTable model.DiffTable) {
+func (out *MdOut) colDiff(diffTable *model.DiffTable) {
 	out.diffFile.WriteString("# " + diffTable.Name + "\n")
 	out.diffFile.WriteString(colTitle)
 	for _, diffCol := range diffTable.DiffColumns {
@@ -68,7 +65,7 @@ func (out *MdOut) colDiff(diffTable model.DiffTable) {
 	}
 }
 
-func (out *MdOut) idxDiff(diffTab model.DiffTable) {
+func (out *MdOut) idxDiff(diffTab *model.DiffTable) {
 	idxFlag := len(diffTab.DiffIndexes) > 0 || len(diffTab.DiffPks) > 0
 	if idxFlag {
 		out.diffFile.WriteString("# " + diffTab.Name + " 索引差异\n")

@@ -1,28 +1,38 @@
 package main
 
 import (
-	"fmt"
-
 	"erm-tools/core"
+	"erm-tools/helper"
 	"erm-tools/model"
 )
 
 func main() {
-	read := core.NewErmRead()
-	read.ReadAll(`D:\workspace\JavaProjects\demo\src\main\resources\db.erm`)
 
-	ermRead := core.NewErmRead()
-	ermRead.ReadAll(`D:\workspace\JavaProjects\demo\src\main\resources\db2.erm`)
+	newErmRead := core.NewErmRead()
+	for _, file := range helper.Env.NewErmFiles() {
+		newErmRead.ReadAll(file)
+	}
+
+	var oldRead core.IRead
+	if helper.Env.Type == helper.ERM_ERM {
+		oldRead = core.NewErmRead()
+	} else if helper.Env.Type == helper.ERM_DB {
+		oldRead = core.NewDbRead()
+	}
+	for _, file := range helper.Env.OldErmFiles() {
+		oldRead.ReadAll(file)
+	}
 
 	diff := core.TableDiff{}
-	var diffTables []model.DiffTable
-	for _, newTab := range read.AllTable {
-		diffTab := diff.Diff(ermRead.Read(newTab.PhysicalName), newTab)
-		fmt.Println(diffTab)
-		diffTables = append(diffTables, diffTab)
+	var diffTables []*model.DiffTable
+	for _, newTab := range newErmRead.AllTable {
+		diffTab := diff.Diff(oldRead.Read(newTab.PhysicalName), newTab)
+		diffTables = append(diffTables, &diffTab)
 	}
-	out := core.MdOut{OutPath: "D:\\workspace\\GoProjects\\erm-tools\\diff.md"}
+	out := core.MdOut{OutPath: helper.Env.OutPath}
 	out.Writer(diffTables)
-	ddlOut := core.DdlOut{OutPath: "D:\\workspace\\GoProjects\\erm-tools\\gen.sql"}
-	ddlOut.Writer(diffTables)
+	if helper.Env.GenDdl {
+		ddlOut := core.DdlOut{OutPath: helper.Env.OutPath}
+		ddlOut.Writer(diffTables)
+	}
 }
