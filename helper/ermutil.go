@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"erm-tools/src/model"
+	"erm-tools/model"
 )
 
 // ErmToTable erm 转 table

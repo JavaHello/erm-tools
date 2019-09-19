@@ -1,6 +1,6 @@
 package core
 
-import "erm-tools/src/model"
+import "erm-tools/model"
 
 // IRead 读取表结构
 type IRead interface {

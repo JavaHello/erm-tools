@@ -1,7 +1,7 @@
 package core
 
 import (
-	"erm-tools/src/model"
+	"erm-tools/model"
 	"log"
 	"os"
 	"strconv"

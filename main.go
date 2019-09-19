@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	"erm-tools/src/core"
-	"erm-tools/src/model"
+	"erm-tools/core"
+	"erm-tools/model"
 )
 
 func main() {

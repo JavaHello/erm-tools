@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var confFile = "../conf/erm-tools.conf"
+var confFile = "./conf/erm-tools.conf"
 
 func init() {
 	fmt.Println("env init")

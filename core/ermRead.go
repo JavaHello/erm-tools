@@ -2,8 +2,8 @@ package core
 
 import (
 	"encoding/xml"
-	"erm-tools/src/helper"
-	"erm-tools/src/model"
+	"erm-tools/helper"
+	"erm-tools/model"
 	"log"
 )
 

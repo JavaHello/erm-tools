@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"strconv"
 
-	"erm-tools/src/model"
+	"erm-tools/model"
 
 	_ "github.com/go-sql-driver/mysql"
 )
