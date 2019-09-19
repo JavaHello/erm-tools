@@ -1,8 +1,8 @@
 package core
 
 import (
+	"erm-tools/logger"
 	"erm-tools/model"
-	"log"
 	"os"
 	"strings"
 )
@@ -28,7 +28,7 @@ type DdlOut struct {
 
 func (out *DdlOut) Writer(diffTables []model.DiffTable) {
 	if fp, err := os.Create(out.OutPath); err != nil {
-		log.Println("创建DDL文件失败", out.OutPath, err)
+		logger.Error.Println("创建DDL文件失败", out.OutPath, err)
 		return
 	} else {
 		out.outFile = fp

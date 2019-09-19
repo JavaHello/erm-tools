@@ -1,12 +1,13 @@
 package helper
 
 import (
+	"erm-tools/logger"
 	"fmt"
 	"io/ioutil"
 	"os"
 )
 
-var confFile = "./conf/erm-tools.conf"
+var confFile = "./conf/erm-tools.confs"
 
 func init() {
 	fmt.Println("env init")
@@ -17,7 +18,7 @@ func init() {
 		}
 	}()
 	if err != nil {
-		fmt.Println("读取配置文件失败", err)
+		logger.Error.Println("读取配置文件失败", err)
 		return
 	}
 

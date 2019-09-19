@@ -1,14 +1,14 @@
 package helper
 
 import (
+	"erm-tools/logger"
 	"io/ioutil"
-	"log"
 )
 
 func ReadFile(path string) []byte {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.Println("util.ReadFileToString Open error ", err)
+		logger.Error.Println("util.ReadFileToString Open error ", err)
 		return nil
 	}
 
