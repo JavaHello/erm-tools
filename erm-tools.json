@@ -2,12 +2,12 @@
     "ermFile": "*.erm",
     "newErmPath": "D:\\workspace\\JavaProjects\\demo\\src\\main\\resources\\db.erm",
     "oldErmPath": "D:\\workspace\\JavaProjects\\demo\\src\\main\\resources\\db2.erm",
-    "dbName": "",
+    "dbName": "demodb",
     "dbHost": "",
     "dbUser": "",
     "dbPass": "",
     "dbType": "mysql",
-    "type": "ERM-ERM",
+    "type": "erm-erm",
     "outPath": "",
-    "genDdl": false
+    "genDdl": true
 }
