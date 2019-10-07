@@ -49,6 +49,8 @@ func init() {
 func (env *EnvModel) verifyEnv() {
 	if env.Type == "" {
 		env.Type = ERM_ERM
+	} else {
+		env.Type = strings.ToUpper(env.Type)
 	}
 	if env.DbType == "" {
 		env.DbType = string(MYSQL)
