@@ -107,6 +107,7 @@ func findFiles(path, ext string) []string {
 	fp, err := os.Open(path)
 	if err != nil {
 		logger.Error("读取文件错误", err)
+		return nil
 	}
 	defer fp.Close()
 

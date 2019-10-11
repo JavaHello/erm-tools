@@ -27,7 +27,11 @@ func main() {
 	diff := core.TableDiff{}
 	var diffTables []*model.DiffTable
 	for _, newTab := range newErmRead.AllTable {
-		diffTab := diff.Diff(oldRead.Read(newTab.PhysicalName), newTab)
+		oldTab := oldRead.Read(newTab.PhysicalName)
+		if oldTab == nil {
+			oldTab = &model.Table{PhysicalName: newTab.PhysicalName}
+		}
+		diffTab := diff.Diff(oldTab, newTab)
 		diffTables = append(diffTables, &diffTab)
 	}
 	out := core.MdOut{OutPath: helper.Env.OutPath}
