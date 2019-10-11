@@ -38,10 +38,10 @@ type EnvModel struct {
 var Env EnvModel
 
 func (env *EnvModel) Init() {
-	logger.Info.Println("env init")
+	logger.Info("env init")
 	err := json.Unmarshal(ReadFile(confFile), &Env)
 	if err != nil {
-		logger.Warn.Println("解析配置文件失败", err)
+		logger.Warn("解析配置文件失败", err)
 	}
 	Env.verifyEnv()
 }
@@ -106,7 +106,7 @@ func findFiles(path, ext string) []string {
 	var filesName []string
 	fp, err := os.Open(path)
 	if err != nil {
-		logger.Error.Println("读取文件错误", err)
+		logger.Error("读取文件错误", err)
 	}
 	defer fp.Close()
 

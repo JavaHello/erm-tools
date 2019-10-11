@@ -29,7 +29,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 		for _, ermCol := range t.Columns.NormalColumn {
 			mapCol, ok := wordMap[ermCol.WordId]
 			if !ok {
-				logger.Warn.Println(t.PhysicalName + "表缺失字段")
+				logger.Warn(t.PhysicalName + "表缺失字段")
 				continue
 			}
 			col := model.Column{

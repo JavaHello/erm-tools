@@ -31,7 +31,7 @@ type DdlOut struct {
 func (out *DdlOut) Writer(diffTables []*model.DiffTable) {
 	ddlFileName := strings.Replace(ddlOutName, "dbname", helper.Env.DbName, 1)
 	if fp, err := os.Create(out.OutPath + string(os.PathSeparator) + ddlFileName); err != nil {
-		logger.Error.Println("创建DDL文件失败", out.OutPath, err)
+		logger.Error("创建DDL文件失败", out.OutPath, err)
 		return
 	} else {
 		out.outFile = fp

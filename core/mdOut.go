@@ -27,7 +27,7 @@ type MdOut struct {
 
 func (out *MdOut) Writer(diffTables []*model.DiffTable) {
 	if fp, err := os.Create(out.OutPath + string(os.PathSeparator) + mdOutName); err != nil {
-		logger.Error.Println("创建DIFF文件失败", out.OutPath, err)
+		logger.Error("创建DIFF文件失败", out.OutPath, err)
 		return
 	} else {
 		out.diffFile = fp

@@ -8,7 +8,7 @@ import (
 func ReadFile(path string) []byte {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		logger.Error.Println("读取文件失败", err)
+		logger.Error("读取文件失败", err)
 		return nil
 	}
 
