@@ -1,6 +1,7 @@
 package core
 
 import (
+	"erm-tools/helper"
 	"erm-tools/logger"
 	"erm-tools/model"
 	"os"
@@ -11,7 +12,7 @@ const (
 	CREATE            = "CREATE "
 	TABLE             = "TABLE "
 	LF                = "\n"
-	ddlOutName string = "gen.sql"
+	ddlOutName string = "gen_dbname.sql"
 )
 
 type OptType string
@@ -28,7 +29,8 @@ type DdlOut struct {
 }
 
 func (out *DdlOut) Writer(diffTables []*model.DiffTable) {
-	if fp, err := os.Create(out.OutPath + string(os.PathSeparator) + ddlOutName); err != nil {
+	ddlFileName := strings.Replace(ddlOutName, "dbname", helper.Env.DbName, 1)
+	if fp, err := os.Create(out.OutPath + string(os.PathSeparator) + ddlFileName); err != nil {
 		logger.Error.Println("创建DDL文件失败", out.OutPath, err)
 		return
 	} else {
