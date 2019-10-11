@@ -133,7 +133,7 @@ func (red *DbRead) readIndex(table *model.Table, colMap map[string]*model.Column
 		}
 		if oldIndexName != indexName {
 			if flag {
-				table.Indexs = append(table.Indexs, &index)
+				table.Indices = append(table.Indices, &index)
 			}
 			flag = true
 			index = model.Index{Name: indexName}
@@ -144,5 +144,5 @@ func (red *DbRead) readIndex(table *model.Table, colMap map[string]*model.Column
 		index.Columns = append(index.Columns, colMap[colName])
 		oldIndexName = indexName
 	}
-	table.Indexs = append(table.Indexs, &index)
+	table.Indices = append(table.Indices, &index)
 }

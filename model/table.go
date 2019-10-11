@@ -12,7 +12,7 @@ type Table struct {
 	Description  string
 	Columns      []*Column
 	PrimaryKeys  []*Column
-	Indexs       []*Index
+	Indices      []*Index
 }
 
 // Column 字段信息
@@ -72,7 +72,7 @@ func NewTable(name string) *Table {
 		PhysicalName: name,
 	}
 	tb.Columns = []*Column{}
-	tb.Indexs = []*Index{}
+	tb.Indices = []*Index{}
 	return &tb
 }
 

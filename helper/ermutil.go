@@ -23,7 +23,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 			LogicalName: t.LogicalName,
 			Description: t.Description}
 		tb.Columns = []*model.Column{}
-		tb.Indexs = []*model.Index{}
+		tb.Indices = []*model.Index{}
 		tb.PrimaryKeys = []*model.Column{}
 		var mapCols = map[string]model.Column{}
 		for _, ermCol := range t.Columns.NormalColumn {
@@ -91,7 +91,7 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 				tbCol.Desc, _ = strconv.ParseBool(idxCol.Desc)
 				tbIdx.Columns = append(tbIdx.Columns, &tbCol)
 			}
-			tb.Indexs = append(tb.Indexs, &tbIdx)
+			tb.Indices = append(tb.Indices, &tbIdx)
 		}
 		tableMap[t.PhysicalName] = &tb
 	}
@@ -102,5 +102,5 @@ func createColUniqueKey(column *model.Column, table *model.Table) {
 	tbIdx := model.Index{Name: "UniqueKey",
 		NonUnique: true}
 	tbIdx.Columns = append(tbIdx.Columns, column)
-	table.Indexs = append(table.Indexs, &tbIdx)
+	table.Indices = append(table.Indices, &tbIdx)
 }
