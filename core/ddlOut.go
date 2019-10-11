@@ -65,7 +65,7 @@ func (out *DdlOut) genDdl(diffTab *model.DiffTable) {
 				idxType = "\tKEY "
 			}
 			if idx.NewIndex != nil {
-				createDdl += idxType + "(" + model.IndexsColName(idx.NewIndex.Columns) + "),\n"
+				createDdl += idxType + "(" + model.IndicesColName(idx.NewIndex.Columns) + "),\n"
 			}
 		}
 
@@ -118,7 +118,7 @@ func (out *DdlOut) genDdl(diffTab *model.DiffTable) {
 					} else {
 						idxType = "UNIQUE INDEX "
 					}
-					idxDdl += idxType + diffIdx.NewIndex.Name + " (" + model.IndexsColName(diffIdx.NewIndex.Columns) + ");\n"
+					idxDdl += idxType + diffIdx.NewIndex.Name + " (" + model.IndicesColName(diffIdx.NewIndex.Columns) + ");\n"
 				} else if opt == DROP {
 					if diffIdx.OldIndex.NonUnique {
 						idxType = " INDEX "

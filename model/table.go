@@ -64,7 +64,7 @@ func (idx *Index) ToCreateDDL() string {
 	} else {
 		idxType = "UNIQUE KEY "
 	}
-	return idxType + idx.Name + IndexsColName(idx.Columns)
+	return idxType + idx.Name + IndicesColName(idx.Columns)
 }
 
 func NewTable(name string) *Table {
@@ -76,7 +76,7 @@ func NewTable(name string) *Table {
 	return &tb
 }
 
-func IndexsColName(cols []*Column) string {
+func IndicesColName(cols []*Column) string {
 	if cols == nil {
 		return ""
 	}
