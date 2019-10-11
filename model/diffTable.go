@@ -2,6 +2,7 @@ package model
 
 type DiffTable struct {
 	Name        string
+	Comment     string
 	IsNew       bool
 	DiffColumns []DiffColumn
 	DiffIndexes []DiffIndex
@@ -20,6 +21,6 @@ type DiffIndex struct {
 	NewIndex *Index
 }
 
-func NewDiffTable(name string) DiffTable {
-	return DiffTable{Name: name, DiffColumns: []DiffColumn{}, DiffIndexes: []DiffIndex{}, DiffPks: []DiffColumn{}}
+func NewDiffTable(physicalName, comment string) DiffTable {
+	return DiffTable{Name: physicalName, Comment: comment, DiffColumns: []DiffColumn{}, DiffIndexes: []DiffIndex{}, DiffPks: []DiffColumn{}}
 }

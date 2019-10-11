@@ -75,12 +75,17 @@ func (out *DdlOut) genDdl(diffTab *model.DiffTable) {
 			for _, pk := range diffTab.DiffPks {
 				pks = appendColName(pk.NewColumn, pks)
 			}
-			createDdl += strings.Join(pks, ", ") + ",\n"
+			createDdl += strings.Join(pks, ", ") + "),\n"
 		}
 		createDdl = createDdl[:len(createDdl)-2]
 		out.outFile.WriteString(createDdl)
-		out.outFile.WriteString(")")
-		out.outFile.WriteString(diffTab.Name)
+		out.outFile.WriteString("\n)")
+		if len(diffTab.Comment) > 0 {
+			out.outFile.WriteString("COMMENT '")
+			out.outFile.WriteString(diffTab.Comment)
+			out.outFile.WriteString("'")
+		}
+		out.outFile.WriteString(";")
 	} else {
 		var colDdl string
 		for _, diffCol := range diffTab.DiffColumns {
