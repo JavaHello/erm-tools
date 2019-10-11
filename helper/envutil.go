@@ -37,7 +37,7 @@ type EnvModel struct {
 
 var Env EnvModel
 
-func init() {
+func (env *EnvModel) Init() {
 	logger.Info.Println("env init")
 	err := json.Unmarshal(ReadFile(confFile), &Env)
 	if err != nil {

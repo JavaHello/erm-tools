@@ -8,6 +8,7 @@ import (
 
 func main() {
 
+	helper.Env.Init()
 	newErmRead := core.NewErmRead()
 	for _, file := range helper.Env.NewErmFiles() {
 		newErmRead.ReadAll(file)
