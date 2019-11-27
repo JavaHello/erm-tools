@@ -78,7 +78,7 @@ func (out *MdOut) idxDiff(diffTab *model.DiffTable) {
 			oldPks = appendColName(pk.OldColumn, oldPks)
 			newPks = appendColName(pk.NewColumn, newPks)
 		}
-		out.diffFile.WriteString("|PRIMARY|" + strings.Join(oldPks, ", ") + "|主键||PRIMARY|" + strings.Join(newPks, ", |主键|\n"))
+		out.diffFile.WriteString("|PRIMARY|" + strings.Join(oldPks, ", ") + "|主键||PRIMARY|" + strings.Join(newPks, ",") + "|主键|\n")
 	}
 	out.indexDiff(diffTab.DiffIndexes)
 
