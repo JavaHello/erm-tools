@@ -60,7 +60,7 @@ func (out *MdOut) colDiff(diffTable *model.DiffTable) {
 		if len(newMd) == 0 {
 			newMd = "||||"
 		}
-		colMd = oldMd + "|" + newMd + "\n"
+		colMd = oldMd + "|" + newMd + "|\n"
 		out.diffFile.WriteString(colMd)
 	}
 }
