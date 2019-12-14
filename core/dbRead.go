@@ -119,7 +119,11 @@ func (read *DbRead) readTable(name string) {
 			col.AutoIncrement = true
 		}
 		col.NotNull = isNull == "NO"
-		col.ColumnType = colType
+		if colType == "" {
+			col.ColumnType = dataType
+		} else {
+			col.ColumnType = colType
+		}
 		tb.Columns = append(tb.Columns, &col)
 		colMap[colName] = &col
 	}

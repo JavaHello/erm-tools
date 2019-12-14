@@ -2,6 +2,11 @@ package core
 
 import (
 	"erm-tools/model"
+	"strings"
+)
+
+var (
+	IgLenCmp = []string{"date", "datetime"} // 忽略长度比对类型
 )
 
 // TableDiff 差异比较
@@ -30,7 +35,7 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 			diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 			continue
 		}
-		if newCol.Type != oldCol.Type || newCol.Length != oldCol.Length || newCol.Decimal != oldCol.Decimal {
+		if newCol.Type != oldCol.Type || (newCol.Length != oldCol.Length || newCol.Decimal != oldCol.Decimal) && !igLenCmp(newCol.Type) {
 			diffCol.NewColumn = newCol
 			diffCol.OldColumn = oldCol
 			diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
@@ -71,6 +76,15 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 	diffIndexes(newTable.Indices, oldTable.Indices, &diffTab)
 
 	return diffTab
+}
+
+func igLenCmp(ct string) bool {
+	for _, t := range IgLenCmp {
+		if strings.ToLower(t) == strings.ToLower(ct) {
+			return true
+		}
+	}
+	return false
 }
 
 // 索引比较
