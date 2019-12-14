@@ -2,6 +2,8 @@ package core
 
 import (
 	"database/sql"
+	"erm-tools/logger"
+	"fmt"
 	"strconv"
 
 	"erm-tools/model"
@@ -20,14 +22,33 @@ type DbRead struct {
 }
 
 // NewDbRead 创建 DbRead
-func NewDbRead() *DbRead {
-	return &DbRead{AbstractRead: AbstractRead{AllTable: make(map[string]*model.Table, 16)}}
+func NewDbRead(user, pass, host, port string) *DbRead {
+	return &DbRead{AbstractRead: AbstractRead{AllTable: make(map[string]*model.Table, 16)},
+		User: user,
+		Pass: pass,
+		Host: host,
+		Port: port,
+	}
+}
+
+func (dr *DbRead) url() string {
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/information_schema?charset=utf8", dr.User, dr.Pass, dr.Host, dr.Port)
 }
 
 func (read *DbRead) db() *sql.DB {
 	if read.database == nil {
-		db, _ := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/information_schema?charset=utf8")
-		db.SetMaxIdleConns(100)
+		url := read.url()
+		db, err := sql.Open("mysql", url)
+		if err != nil {
+			logger.Error("数据库连接失败,URL:", url)
+			panic(err)
+		}
+		_, err = db.Query("select 1")
+		if err != nil {
+			logger.Error("数据库连接失败,URL:", url)
+			panic(err)
+		}
+		db.SetMaxIdleConns(10)
 		db.SetMaxOpenConns(10)
 		read.database = db
 	}

@@ -3,11 +3,12 @@
     "newErmPath": "D:\\workspace\\JavaProjects\\demo\\src\\main\\resources\\db.erm",
     "oldErmPath": "D:\\workspace\\JavaProjects\\demo\\src\\main\\resources\\db2.erm",
     "dbName": "demodb",
-    "dbHost": "",
-    "dbUser": "",
-    "dbPass": "",
+    "dbHost": "127.0.0.1",
+    "dbUser": "root",
+    "dbPassword": "123456",
+    "dbPort": "3306",
     "dbType": "mysql",
-    "type": "erm-erm",
+    "type": "erm-db",
     "outPath": "",
     "genDdl": true
 }

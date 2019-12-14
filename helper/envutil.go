@@ -28,7 +28,8 @@ type EnvModel struct {
 	DbName     string `json:"dbName"`
 	DbHost     string `json:"dbHost"`
 	DbUser     string `json:"dbUser"`
-	DbPass     string `json:"dbPass"`
+	DbPassword string `json:"dbPassword"`
+	DbPort     string `json:"DbPort"`
 	DbType     string `json:"dbType"`
 	Type       string `json:"type"`
 	OutPath    string `json:"outPath"`
@@ -38,7 +39,6 @@ type EnvModel struct {
 var Env EnvModel
 
 func (env *EnvModel) Init() {
-	logger.Info("env init")
 	err := json.Unmarshal(ReadFile(confFile), &Env)
 	if err != nil {
 		logger.Warn("解析配置文件失败", err)
@@ -66,7 +66,8 @@ func (env *EnvModel) verifyEnv() {
 		assertNotEmpty("dbName 配置错误", env.DbName)
 		assertNotEmpty("dbHost 配置错误", env.DbHost)
 		assertNotEmpty("dbUser 配置错误", env.DbUser)
-		assertNotEmpty("dbPass 配置错误", env.DbPass)
+		assertNotEmpty("dbPassword 配置错误", env.DbPassword)
+		assertNotEmpty("dbPort 配置错误", env.DbPort)
 	} else {
 		assertNotEmpty("type 配置错误，可选范围(ERM-ERM|ERM-DB)", env.Type)
 	}

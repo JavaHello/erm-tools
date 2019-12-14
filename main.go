@@ -18,7 +18,10 @@ func main() {
 	if helper.Env.Type == helper.ERM_ERM {
 		oldRead = core.NewErmRead()
 	} else if helper.Env.Type == helper.ERM_DB {
-		oldRead = core.NewDbRead()
+		oldRead = core.NewDbRead(helper.Env.DbUser,
+			helper.Env.DbPassword,
+			helper.Env.DbHost,
+			helper.Env.DbPort)
 	}
 	for _, file := range helper.Env.OldErmFiles() {
 		oldRead.ReadAll(file)
