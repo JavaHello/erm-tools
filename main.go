@@ -4,6 +4,7 @@ import (
 	"erm-tools/core"
 	"erm-tools/helper"
 	"erm-tools/model"
+	"sort"
 )
 
 func main() {
@@ -37,6 +38,7 @@ func main() {
 		diffTab := diff.Diff(oldTab, newTab)
 		diffTables = append(diffTables, &diffTab)
 	}
+	sort.Sort(model.DiffTableSlice(diffTables))
 	out := core.MdOut{OutPath: helper.Env.OutPath}
 	out.Writer(diffTables)
 	if helper.Env.GenDdl {

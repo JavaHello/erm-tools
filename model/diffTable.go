@@ -1,5 +1,7 @@
 package model
 
+import "strings"
+
 type DiffTable struct {
 	Name        string
 	Comment     string
@@ -8,6 +10,12 @@ type DiffTable struct {
 	DiffIndexes []DiffIndex
 	DiffPks     []DiffColumn
 }
+
+type DiffTableSlice []*DiffTable
+
+func (p DiffTableSlice) Len() int           { return len(p) }
+func (p DiffTableSlice) Less(i, j int) bool { return strings.Compare(p[i].Name, p[j].Name) < 0 }
+func (p DiffTableSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 type DiffColumn struct {
 	Name      string
