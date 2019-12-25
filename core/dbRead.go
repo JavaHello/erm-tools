@@ -97,19 +97,19 @@ func (read *DbRead) readTable(name string) {
 	if tb == nil {
 		tb = model.NewTable(name)
 	}
-	var tableName string
-	var colName string
-	var isNull string
-	var dataType string
-	var charLen string
-	var numLen string
-	var numScale string
-	var colComment string
-	var colType string
-	var extra string
-	var defval string
 	var colMap = map[string]*model.Column{}
 	for rows.Next() {
+		var tableName string
+		var colName string
+		var isNull string
+		var dataType string
+		var charLen string
+		var numLen string
+		var numScale string
+		var colComment string
+		var colType string
+		var extra string
+		var defval string
 		rows.Scan(&tableName, &colName, &isNull, &dataType, &charLen, &numLen, &numScale, &colComment, &colType, &extra, &defval)
 		var col model.Column
 		col.PhysicalName = colName

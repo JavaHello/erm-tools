@@ -43,11 +43,11 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 			col.PrimaryKey, _ = strconv.ParseBool(ermCol.PrimaryKey)
 			col.UniqueKey, _ = strconv.ParseBool(ermCol.UniqueKey)
 			col.PrimaryKey, _ = strconv.ParseBool(ermCol.PrimaryKey)
-			if mapCol.Length != "" {
+			if notNull(mapCol.Length) {
 				l, _ := strconv.Atoi(mapCol.Length)
 				col.Length = int(l)
 			}
-			if mapCol.Decimal != "" {
+			if notNull(mapCol.Decimal) {
 				l, _ := strconv.Atoi(mapCol.Decimal)
 				col.Decimal = int(l)
 			}
@@ -58,9 +58,9 @@ func ErmToTable(erm *model.Diagram, tableMap map[string]*model.Table) {
 				createColUniqueKey(&col, &tb)
 			}
 			// erm int 没有设置长度
-			if col.Type == "int" || col.Type == "integer" {
-				col.Length = 10
-			}
+			// if col.Type == "int" || col.Type == "integer" {
+			// 	col.Length = 10
+			// }
 			if strings.Contains(col.Type, "character(n)") {
 				col.Type = "varchar(n)"
 			}
@@ -103,4 +103,8 @@ func createColUniqueKey(column *model.Column, table *model.Table) {
 		NonUnique: true}
 	tbIdx.Columns = append(tbIdx.Columns, column)
 	table.Indices = append(table.Indices, &tbIdx)
+}
+
+func notNull(str string) bool {
+	return str != "" && str != "null"
 }
