@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	IgLenCmp = []string{"date", "datetime"} // 忽略长度比对类型
+	// IgLenCmp 忽略长度比对类型
+	IgLenCmp = []string{"date", "datetime"}
 )
 
 // TableDiff 差异比较
@@ -35,7 +36,7 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 			diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 			continue
 		}
-		if newCol.Type != oldCol.Type || (newCol.Length != oldCol.Length || newCol.Decimal != oldCol.Decimal) && !igLenCmp(newCol.Type) {
+		if !same(newCol.Type, oldCol.Type) || (newCol.Length != oldCol.Length || newCol.Decimal != oldCol.Decimal) && !igLenCmp(newCol.Type) {
 			diffCol.NewColumn = newCol
 			diffCol.OldColumn = oldCol
 			diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
@@ -76,6 +77,20 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 	diffIndexes(newTable.Indices, oldTable.Indices, &diffTab)
 
 	return diffTab
+}
+
+func same(t1, t2 string) bool {
+	if t1 == t2 {
+		return true
+	}
+	if isInt(t1) && isInt(t2) {
+		return true
+	}
+	return false
+}
+func isInt(t string) bool {
+	t = strings.ToLower(t)
+	return "int" == t || "integer" == t
 }
 
 func igLenCmp(ct string) bool {

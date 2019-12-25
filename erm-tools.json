@@ -9,6 +9,13 @@
     "dbPort": "3306",
     "dbType": "mysql",
     "type": "erm-db",
+    "targetDbList": [{
+        "dbName": "demodb",
+        "dbHost": "127.0.0.1",
+        "dbUser": "root",
+        "dbPassword": "123456",
+        "dbPort": "3306"
+    }],
     "outPath": "",
     "genDdl": true
 }

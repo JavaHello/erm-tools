@@ -19,15 +19,17 @@ type DbRead struct {
 	Pass     string
 	Host     string
 	Port     string
+	DbName   string
 }
 
 // NewDbRead 创建 DbRead
-func NewDbRead(user, pass, host, port string) *DbRead {
+func NewDbRead(user, pass, host, port, dbName string) *DbRead {
 	return &DbRead{AbstractRead: AbstractRead{AllTable: make(map[string]*model.Table, 16)},
-		User: user,
-		Pass: pass,
-		Host: host,
-		Port: port,
+		User:   user,
+		Pass:   pass,
+		Host:   host,
+		Port:   port,
+		DbName: dbName,
 	}
 }
 
@@ -58,7 +60,17 @@ func (read *DbRead) db() *sql.DB {
 
 // ReadAll 读取所有数据库表结构
 func (red *DbRead) ReadAll(dbname string) {
-	red.readTable("tm_test2")
+	db := red.db()
+	stmt, _ := db.Prepare("SELECT TABLE_NAME FROM TABLES WHERE TABLE_SCHEMA = ?")
+	defer stmt.Close()
+	rows, _ := stmt.Query(dbname)
+	defer rows.Close()
+	defer rows.Close()
+	var tableName string
+	for rows.Next() {
+		rows.Scan(&tableName)
+		red.readTable(tableName)
+	}
 }
 
 func (read *DbRead) readTable(name string) {
@@ -79,7 +91,7 @@ func (read *DbRead) readTable(name string) {
 	where TABLE_SCHEMA = ?
 	and TABLE_NAME = ?`)
 	defer stmt.Close()
-	rows, _ := stmt.Query("demodb", name)
+	rows, _ := stmt.Query(read.DbName, name)
 	defer rows.Close()
 	tb := read.AllTable[name]
 	if tb == nil {
@@ -96,10 +108,10 @@ func (read *DbRead) readTable(name string) {
 	var colType string
 	var extra string
 	var defval string
-	var col model.Column
 	var colMap = map[string]*model.Column{}
 	for rows.Next() {
 		rows.Scan(&tableName, &colName, &isNull, &dataType, &charLen, &numLen, &numScale, &colComment, &colType, &extra, &defval)
+		var col model.Column
 		col.PhysicalName = colName
 		col.LogicalName = colComment
 		col.Type = dataType

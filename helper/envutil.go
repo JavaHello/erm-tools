@@ -13,6 +13,7 @@ var confFile = "./erm-tools.json"
 const (
 	ERM_ERM = "ERM-ERM"
 	ERM_DB  = "ERM-DB"
+	DB_DB   = "DB-DB"
 )
 
 type DBType string
@@ -22,18 +23,27 @@ const (
 )
 
 type EnvModel struct {
-	ErmFile    string `json:"ermFile"`
-	NewErmPath string `json:"newErmPath"`
-	OldErmPath string `json:"oldErmPath"`
+	ErmFile      string      `json:"ermFile"`
+	NewErmPath   string      `json:"newErmPath"`
+	OldErmPath   string      `json:"oldErmPath"`
+	DbName       string      `json:"dbName"`
+	DbHost       string      `json:"dbHost"`
+	DbUser       string      `json:"dbUser"`
+	DbPassword   string      `json:"dbPassword"`
+	DbPort       string      `json:"DbPort"`
+	DbType       string      `json:"dbType"`
+	Type         string      `json:"type"`
+	OutPath      string      `json:"outPath"`
+	GenDdl       bool        `json:"genDdl"`
+	TargetDbList []*DbConfig `json:targetDbList`
+}
+
+type DbConfig struct {
 	DbName     string `json:"dbName"`
 	DbHost     string `json:"dbHost"`
 	DbUser     string `json:"dbUser"`
 	DbPassword string `json:"dbPassword"`
 	DbPort     string `json:"DbPort"`
-	DbType     string `json:"dbType"`
-	Type       string `json:"type"`
-	OutPath    string `json:"outPath"`
-	GenDdl     bool   `json:"genDdl"`
 }
 
 var Env EnvModel
@@ -58,19 +68,28 @@ func (env *EnvModel) verifyEnv() {
 	if env.OutPath == "" {
 		env.OutPath = "./"
 	}
-	assertNotEmpty("ermFile 配置错误", env.ErmFile)
-	assertNotEmpty("newErmPath 配置错误", env.NewErmPath)
 	if env.Type == ERM_ERM {
+		assertNotEmpty("ermFile 配置错误", env.ErmFile)
+		assertNotEmpty("newErmPath 配置错误", env.NewErmPath)
 		assertNotEmpty("oldErmPath 配置错误", env.OldErmPath)
 	} else if env.Type == ERM_DB {
-		assertNotEmpty("dbName 配置错误", env.DbName)
-		assertNotEmpty("dbHost 配置错误", env.DbHost)
-		assertNotEmpty("dbUser 配置错误", env.DbUser)
-		assertNotEmpty("dbPassword 配置错误", env.DbPassword)
-		assertNotEmpty("dbPort 配置错误", env.DbPort)
+		assertNotEmpty("ermFile 配置错误", env.ErmFile)
+		assertNotEmpty("newErmPath 配置错误", env.NewErmPath)
+		env.verifyDb()
+	} else if env.Type == DB_DB {
+		env.verifyDb()
+		assertTrue("targetDbList 配置错误", env.TargetDbList == nil || len(env.TargetDbList) == 0)
 	} else {
 		assertNotEmpty("type 配置错误，可选范围(ERM-ERM|ERM-DB)", env.Type)
 	}
+}
+
+func (env *EnvModel) verifyDb() {
+	assertNotEmpty("dbName 配置错误", env.DbName)
+	assertNotEmpty("dbHost 配置错误", env.DbHost)
+	assertNotEmpty("dbUser 配置错误", env.DbUser)
+	assertNotEmpty("dbPassword 配置错误", env.DbPassword)
+	assertNotEmpty("dbPort 配置错误", env.DbPort)
 }
 
 func (env *EnvModel) NewErmFiles() []string {
@@ -99,6 +118,11 @@ func (env *EnvModel) OldErmFiles() []string {
 
 func assertNotEmpty(msg, str string) {
 	if str == "" || strings.Trim(str, " ") == "" || strings.Trim(str, "　") == "" {
+		panic(msg)
+	}
+}
+func assertTrue(msg string, f bool) {
+	if !f {
 		panic(msg)
 	}
 }
