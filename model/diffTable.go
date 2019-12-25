@@ -29,6 +29,6 @@ type DiffIndex struct {
 	NewIndex *Index
 }
 
-func NewDiffTable(physicalName, comment string) DiffTable {
-	return DiffTable{Name: physicalName, Comment: comment, DiffColumns: []DiffColumn{}, DiffIndexes: []DiffIndex{}, DiffPks: []DiffColumn{}}
+func NewDiffTable(physicalName, comment string) *DiffTable {
+	return &DiffTable{Name: physicalName, Comment: comment, DiffColumns: []DiffColumn{}, DiffIndexes: []DiffIndex{}, DiffPks: []DiffColumn{}}
 }

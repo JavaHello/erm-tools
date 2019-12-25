@@ -103,7 +103,9 @@ func diff(newRead, oldRead *AbstractRead) []*model.DiffTable {
 			oldTab = &model.Table{PhysicalName: newTab.PhysicalName}
 		}
 		diffTab := diff.Diff(oldTab, newTab)
-		diffTables = append(diffTables, &diffTab)
+		if diffTab != nil {
+			diffTables = append(diffTables, diffTab)
+		}
 	}
 	sort.Sort(model.DiffTableSlice(diffTables))
 	return diffTables

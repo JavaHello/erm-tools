@@ -14,8 +14,15 @@ var (
 type TableDiff struct {
 }
 
+func (diff *TableDiff) diffTable(diffTable *model.DiffTable, physicalName, logicalName string) *model.DiffTable {
+	if diffTable == nil {
+		diffTable = model.NewDiffTable(physicalName, logicalName)
+	}
+	return diffTable
+}
+
 // Diff 比对表结构差异
-func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.DiffTable {
+func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) *model.DiffTable {
 
 	// 字段比较
 	oldCols := oldTable.Columns
@@ -23,8 +30,7 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 
 	oldGroupCols := groupColumns(oldCols)
 
-	diffTab := model.NewDiffTable(newTable.PhysicalName, newTable.LogicalName)
-	diffTab.IsNew = len(oldTable.Columns) == 0
+	var diffTab *model.DiffTable
 	for _, newCol := range newCols {
 		var diffCol model.DiffColumn
 		diffCol.Name = newCol.PhysicalName
@@ -33,12 +39,18 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 
 		if !ok {
 			diffCol.NewColumn = newCol
+			if diffTab == nil {
+				diffTab = diff.diffTable(diffTab, newTable.PhysicalName, newTable.LogicalName)
+			}
 			diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 			continue
 		}
 		if !same(newCol.Type, oldCol.Type) || (newCol.Length != oldCol.Length || newCol.Decimal != oldCol.Decimal) && !igLenCmp(newCol.Type) {
 			diffCol.NewColumn = newCol
 			diffCol.OldColumn = oldCol
+			if diffTab == nil {
+				diffTab = diff.diffTable(diffTab, newTable.PhysicalName, newTable.LogicalName)
+			}
 			diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 			continue
 		}
@@ -47,6 +59,9 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 		var diffCol model.DiffColumn
 		diffCol.Name = oldCol.PhysicalName
 		diffCol.OldColumn = oldCol
+		if diffTab == nil {
+			diffTab = diff.diffTable(diffTab, newTable.PhysicalName, newTable.LogicalName)
+		}
 		diffTab.DiffColumns = append(diffTab.DiffColumns, diffCol)
 	}
 
@@ -63,6 +78,9 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 		delete(oldGroupPks, newPk.PhysicalName)
 		if !ok {
 			diffPk.NewColumn = newPk
+			if diffTab == nil {
+				diffTab = diff.diffTable(diffTab, newTable.PhysicalName, newTable.LogicalName)
+			}
 			diffTab.DiffPks = append(diffTab.DiffPks, diffPk)
 		}
 	}
@@ -70,12 +88,18 @@ func (diff *TableDiff) Diff(oldTable *model.Table, newTable *model.Table) model.
 		var diffPk model.DiffColumn
 		diffPk.Name = oldPk.PhysicalName
 		diffPk.OldColumn = oldPk
+		if diffTab == nil {
+			diffTab = diff.diffTable(diffTab, newTable.PhysicalName, newTable.LogicalName)
+		}
 		diffTab.DiffPks = append(diffTab.DiffPks, diffPk)
 	}
 
 	// 索引比较
-	diffIndexes(newTable.Indices, oldTable.Indices, &diffTab)
+	diffIndexes(newTable.Indices, oldTable.Indices, diffTab)
 
+	if diffTab != nil {
+		diffTab.IsNew = len(oldTable.Columns) == 0
+	}
 	return diffTab
 }
 
