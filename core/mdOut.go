@@ -40,8 +40,7 @@ func (out *MdOut) Writer(diffTables []*model.DiffTable) {
 }
 
 func (out *MdOut) colDiff(diffTable *model.DiffTable) {
-	out.diffFile.WriteString("# " + diffTable.Name + "\n")
-	out.diffFile.WriteString(colTitle)
+	title := "# " + diffTable.Name + "\n" + colTitle
 	for _, diffCol := range diffTable.DiffColumns {
 		oldCol := diffCol.OldColumn
 		newCol := diffCol.NewColumn
@@ -61,7 +60,7 @@ func (out *MdOut) colDiff(diffTable *model.DiffTable) {
 			newMd = "||||"
 		}
 		colMd = oldMd + "|" + newMd + "|\n"
-		out.diffFile.WriteString(colMd)
+		out.diffFile.WriteString(title + colMd)
 	}
 }
 

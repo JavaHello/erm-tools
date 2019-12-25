@@ -35,7 +35,7 @@ type EnvModel struct {
 	Type         string      `json:"type"`
 	OutPath      string      `json:"outPath"`
 	GenDdl       bool        `json:"genDdl"`
-	TargetDbList []*DbConfig `json:targetDbList`
+	TargetDbList []*DbConfig `json:"targetDbList"`
 }
 
 type DbConfig struct {
@@ -78,7 +78,7 @@ func (env *EnvModel) verifyEnv() {
 		env.verifyDb()
 	} else if env.Type == DB_DB {
 		env.verifyDb()
-		assertTrue("targetDbList 配置错误", env.TargetDbList == nil || len(env.TargetDbList) == 0)
+		assertTrue("targetDbList 配置错误", env.TargetDbList != nil && len(env.TargetDbList) != 0)
 	} else {
 		assertNotEmpty("type 配置错误，可选范围(ERM-ERM|ERM-DB)", env.Type)
 	}

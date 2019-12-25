@@ -85,7 +85,7 @@ func (out *DdlOut) genDdl(diffTab *model.DiffTable) {
 			out.outFile.WriteString(diffTab.Comment)
 			out.outFile.WriteString("'")
 		}
-		out.outFile.WriteString(";")
+		out.outFile.WriteString(";\n")
 	} else {
 		var colDdl string
 		for _, diffCol := range diffTab.DiffColumns {
@@ -134,7 +134,6 @@ func (out *DdlOut) genDdl(diffTab *model.DiffTable) {
 			out.outFile.WriteString(diffTab.Name + " 表主键有修改，请自行确认~\n")
 		}
 	}
-	out.outFile.WriteString("\n")
 }
 
 func (out *DdlOut) optColType(oldCol, newCol *model.Column) OptType {

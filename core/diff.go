@@ -127,7 +127,7 @@ func diffIndexes(newIdxes, oldIdxes []*model.Index, diffTab *model.DiffTable) {
 func groupIndex(idxes []*model.Index) (res map[string]*model.Index) {
 	res = map[string]*model.Index{}
 	for _, idx := range idxes {
-		res[idx.Name] = idx
+		res[model.ColumnsName(idx.Columns)] = idx
 	}
 	return res
 }

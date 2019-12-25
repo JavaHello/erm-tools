@@ -158,28 +158,22 @@ func (red *DbRead) readIndex(table *model.Table, colMap map[string]*model.Column
 	var indexName string
 	var colName string
 	var oldIndexName string
-	var index model.Index
-	flag := false
+	var index *model.Index
 	for rows.Next() {
 		rows.Scan(&tableName, &nonUnique, &indexName, &colName)
 		if indexName == "PRIMARY" {
 			col := colMap[colName]
 			col.PrimaryKey = true
 			table.PrimaryKeys = append(table.PrimaryKeys, col)
-			continue
-		}
-		if oldIndexName != indexName {
-			if flag {
-				table.Indices = append(table.Indices, &index)
-			}
-			flag = true
-			index = model.Index{Name: indexName}
-			index.NonUnique, _ = strconv.ParseBool(nonUnique)
+		} else if oldIndexName != indexName {
+			index = &model.Index{Name: indexName}
 			index.Columns = []*model.Column{}
-
+			index.NonUnique, _ = strconv.ParseBool(nonUnique)
+			table.Indices = append(table.Indices, index)
+			index.Columns = append(index.Columns, colMap[colName])
+		} else {
+			index.Columns = append(index.Columns, colMap[colName])
 		}
-		index.Columns = append(index.Columns, colMap[colName])
 		oldIndexName = indexName
 	}
-	table.Indices = append(table.Indices, &index)
 }
