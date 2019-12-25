@@ -40,7 +40,8 @@ func (out *MdOut) Writer(diffTables []*model.DiffTable) {
 }
 
 func (out *MdOut) colDiff(diffTable *model.DiffTable) {
-	title := "# " + diffTable.Name + "\n" + colTitle
+	title := "# " + diffTable.Name + colTitle
+	f := true
 	for _, diffCol := range diffTable.DiffColumns {
 		oldCol := diffCol.OldColumn
 		newCol := diffCol.NewColumn
@@ -60,14 +61,21 @@ func (out *MdOut) colDiff(diffTable *model.DiffTable) {
 			newMd = "||||"
 		}
 		colMd = oldMd + "|" + newMd + "|\n"
-		out.diffFile.WriteString(title + colMd)
+		if f {
+			out.diffFile.WriteString(title)
+			f = false
+		}
+		out.diffFile.WriteString(colMd)
+	}
+	if !f {
+		out.diffFile.WriteString("\n")
 	}
 }
 
 func (out *MdOut) idxDiff(diffTab *model.DiffTable) {
 	idxFlag := len(diffTab.DiffIndexes) > 0 || len(diffTab.DiffPks) > 0
 	if idxFlag {
-		out.diffFile.WriteString("# " + diffTab.Name + " 索引差异\n")
+		out.diffFile.WriteString("# " + diffTab.Name + " 索引差异")
 		out.diffFile.WriteString(idxTitle)
 	}
 	if len(diffTab.DiffPks) > 0 {
@@ -80,7 +88,9 @@ func (out *MdOut) idxDiff(diffTab *model.DiffTable) {
 		out.diffFile.WriteString("|PRIMARY|" + strings.Join(oldPks, ", ") + "|主键||PRIMARY|" + strings.Join(newPks, ",") + "|主键|\n")
 	}
 	out.indexDiff(diffTab.DiffIndexes)
-
+	if idxFlag {
+		out.diffFile.WriteString("\n")
+	}
 }
 func (out *MdOut) indexDiff(diffIdx []model.DiffIndex) {
 
