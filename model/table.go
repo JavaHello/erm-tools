@@ -2,6 +2,7 @@ package model
 
 import (
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -90,6 +91,13 @@ func IndicesColName(cols []*Column) string {
 	}
 	sort.Strings(names)
 	return strings.Join(names, ",")
+}
+
+func IndexKeyName(index *Index) string {
+	if index == nil {
+		return ""
+	}
+	return ColumnsName(index.Columns) + strconv.FormatBool(index.NonUnique)
 }
 
 func ColumnsName(cols []*Column) string {

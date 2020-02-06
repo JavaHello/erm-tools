@@ -132,7 +132,7 @@ func diffIndexes(newIdxes, oldIdxes []*model.Index, diffTab *model.DiffTable) {
 	for _, newIdx := range newIdxes {
 		var diffIdx model.DiffIndex
 		diffIdx.Name = newIdx.Name
-		newKey := model.ColumnsName(newIdx.Columns)
+		newKey := model.IndexKeyName(newIdx)
 		_, ok := oldGroupIdxes[newKey]
 		delete(oldGroupIdxes, newKey)
 		if !ok {
@@ -151,7 +151,7 @@ func diffIndexes(newIdxes, oldIdxes []*model.Index, diffTab *model.DiffTable) {
 func groupIndex(idxes []*model.Index) (res map[string]*model.Index) {
 	res = map[string]*model.Index{}
 	for _, idx := range idxes {
-		res[model.ColumnsName(idx.Columns)] = idx
+		res[model.IndexKeyName(idx)] = idx
 	}
 	return res
 }
